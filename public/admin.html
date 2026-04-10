@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Vinícius Tavares</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0f1e; font-family: 'Segoe UI', monospace; color: #fff; }
+    .login-container { max-width: 400px; margin: 100px auto; background: #111827; padding: 40px; border-radius: 20px; border: 1px solid #00ffff33; box-shadow: 0 0 20px #00ffff22; }
+    .login-container h2 { text-align: center; color: #00ffff; margin-bottom: 30px; }
+    .login-container input { width: 100%; padding: 14px; margin: 10px 0; background: #1f2937; border: 1px solid #374151; border-radius: 12px; color: white; }
+    .login-container button { width: 100%; padding: 14px; background: linear-gradient(90deg, #00ffff, #0066ff); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .dashboard { display: none; }
+    .admin-header { background: #111827; padding: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #00ffff33; flex-wrap: wrap; gap: 15px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; padding: 20px; }
+    .stat-card { background: #1f2937; padding: 20px; border-radius: 20px; text-align: center; border-left: 4px solid #00ffff; }
+    .stat-card .number { font-size: 32px; color: #00ffff; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #374151; }
+    th { background: #1f2937; color: #00ffff; }
+    .logout-btn { background: #ff0044; padding: 8px 20px; border: none; border-radius: 10px; cursor: pointer; }
+    .tab { background: #1f2937; padding: 10px 20px; border: none; margin: 5px; border-radius: 10px; cursor: pointer; color: white; }
+    .tab.active { background: #00ffff; color: #000; }
+    .tab-content { display: none; padding: 20px; }
+    .tab-content.active { display: block; }
+    .btn-delete { background: #ff0044; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: white; transition: 0.2s; }
+    .btn-delete:hover { background: #cc0033; transform: scale(1.05); }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+    .status-finalizado { background: #00aa44; }
+    .status-pendente { background: #ff8800; }
+    .btn-finalizar { background: #00aa44; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: white; margin-right: 5px; }
+    .btn-finalizar:hover { background: #008833; }
+    @media (max-width: 768px) { th, td { font-size: 0.75rem; padding: 8px; } .btn-delete, .btn-finalizar { padding: 3px 8px; font-size: 0.7rem; } }
+  </style>
+</head>
+<body>
+<div id="login" class="login-container">
+  <h2><i class="fas fa-brain"></i> Vinícius Admin</h2>
+  <input type="text" id="username" placeholder="Usuário" value="admin">
+  <input type="password" id="password" placeholder="Senha" value="Vini@Futuro2026#Secure">
+  <button onclick="login()">Acessar Nível 5</button>
+</div>
+<div id="dashboard" class="dashboard">
+  <div class="admin-header">
+    <h2><i class="fas fa-chart-line"></i> Painel de Controle - Futurista</h2>
+    <button class="logout-btn" onclick="logout()">Sair</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div style="padding: 0 20px;">
+    <button class="tab active" onclick="showTab('leads')">📩 Leads / Pedidos</button>
+  </div>
+  <div id="leads" class="tab-content active">
+    <div style="overflow-x:auto;">
+      <table id="leads-table">
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Mensagem</th><th>Status</th><th>Data</th><th>Ações</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  let token = '';
+  
+  async function login() {
+    const res = await fetch('/api/admin/login', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({ 
+        username: document.getElementById('username').value, 
+        password: document.getElementById('password').value 
+      }) 
+    });
+    if (res.ok) { 
+      const data = await res.json(); 
+      token = data.token; 
+      localStorage.setItem('portfolio_token', token); 
+      document.getElementById('login').style.display = 'none'; 
+      document.getElementById('dashboard').style.display = 'block'; 
+      loadDashboard(); 
+    } else alert('Falha na autenticação'); 
+  }
+  
+  function logout() { localStorage.removeItem('portfolio_token'); location.reload(); }
+  
+  async function loadDashboard() { 
+    const saved = localStorage.getItem('portfolio_token'); 
+    if (saved) token = saved; 
+    if (!token) return;
+    
+    const statsRes = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } }); 
+    const stats = await statsRes.json();
+    document.getElementById('stats').innerHTML = `
+      <div class="stat-card"><div class="number">${stats.totalLeads}</div><p>Total de Leads</p></div>
+      <div class="stat-card"><div class="number">${stats.pendentes || 0}</div><p>Pendentes</p></div>
+      <div class="stat-card"><div class="number">${stats.finalizados || 0}</div><p>Finalizados</p></div>
+      <div class="stat-card"><div class="number">${stats.projetosTotal}</div><p>Projetos Portfólio</p></div>
+    `;
+    
+    await carregarLeads();
+  }
+  
+  async function carregarLeads() {
+    const res = await fetch('/api/admin/leads', { headers: { 'Authorization': `Bearer ${token}` } });
+    const leads = await res.json();
+    document.querySelector('#leads-table tbody').innerHTML = leads.map(l => `
+      <tr>
+        <td>${l.id}</td>
+        <td>${l.nome}</td>
+        <td>${l.email}</td>
+        <td>${l.telefone || '-'}</td>
+        <td style="max-width:300px; white-space:normal;">${l.mensagem}</td>
+        <td><span class="status-badge ${l.status === 'finalizado' ? 'status-finalizado' : 'status-pendente'}">${l.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}</span></td>
+        <td>${new Date(l.data).toLocaleString()}</td>
+        <td>
+          ${l.status !== 'finalizado' ? `<button class="btn-finalizar" onclick="finalizarLead(${l.id})">✓ Finalizar</button>` : ''}
+          <button class="btn-delete" onclick="deletarLead(${l.id})">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  async function finalizarLead(id) {
+    if (!confirm('Marcar este lead como FINALIZADO?')) return;
+    await fetch(`/api/admin/leads/${id}/finalizar`, { 
+      method: 'PUT', 
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } 
+    });
+    carregarLeads();
+    loadDashboard();
+  }
+  
+  async function deletarLead(id) {
+    if (!confirm('⚠️ Tem certeza que deseja EXCLUIR este lead permanentemente?')) return;
+    await fetch(`/api/admin/leads/${id}`, { 
+      method: 'DELETE', 
+      headers: { 'Authorization': `Bearer ${token}` } 
+    });
+    carregarLeads();
+    loadDashboard();
+  }
+  
+  function showTab(tab) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.getElementById(tab).classList.add('active'); 
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
+    event.target.classList.add('active'); 
+  }
+  
+  const saved = localStorage.getItem('portfolio_token'); 
+  if (saved) { token = saved; document.getElementById('login').style.display = 'none'; document.getElementById('dashboard').style.display = 'block'; loadDashboard(); }
+</script>
+</body>
+</html>
