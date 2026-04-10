@@ -19,8 +19,20 @@
     .stat-card { background: #1f2937; padding: 20px; border-radius: 20px; text-align: center; border-left: 4px solid #00ffff; }
     .stat-card .number { font-size: 32px; color: #00ffff; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #374151; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #374151; vertical-align: top; }
     th { background: #1f2937; color: #00ffff; }
+    /* CORREÇÃO: Quebra de linha para mensagens longas */
+    td {
+        word-break: break-word;
+        white-space: normal;
+        max-width: 300px;
+    }
+    .mensagem-cell {
+        max-width: 300px;
+        word-wrap: break-word;
+        white-space: normal;
+        line-height: 1.4;
+    }
     .logout-btn { background: #ff0044; padding: 8px 20px; border: none; border-radius: 10px; cursor: pointer; }
     .tab { background: #1f2937; padding: 10px 20px; border: none; margin: 5px; border-radius: 10px; cursor: pointer; color: white; }
     .tab.active { background: #00ffff; color: #000; }
@@ -33,7 +45,11 @@
     .status-pendente { background: #ff8800; }
     .btn-finalizar { background: #00aa44; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: white; margin-right: 5px; }
     .btn-finalizar:hover { background: #008833; }
-    @media (max-width: 768px) { th, td { font-size: 0.75rem; padding: 8px; } .btn-delete, .btn-finalizar { padding: 3px 8px; font-size: 0.7rem; } }
+    @media (max-width: 768px) { 
+        th, td { font-size: 0.7rem; padding: 6px; } 
+        .btn-delete, .btn-finalizar { padding: 3px 8px; font-size: 0.65rem; }
+        .mensagem-cell { max-width: 150px; }
+    }
   </style>
 </head>
 <body>
@@ -114,13 +130,13 @@
         <td>${l.nome}</td>
         <td>${l.email}</td>
         <td>${l.telefone || '-'}</td>
-        <td style="max-width:300px; white-space:normal;">${l.mensagem}</td>
+        <td class="mensagem-cell">${l.mensagem}</td>
         <td><span class="status-badge ${l.status === 'finalizado' ? 'status-finalizado' : 'status-pendente'}">${l.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}</span></td>
         <td>${new Date(l.data).toLocaleString()}</td>
         <td>
           ${l.status !== 'finalizado' ? `<button class="btn-finalizar" onclick="finalizarLead(${l.id})">✓ Finalizar</button>` : ''}
           <button class="btn-delete" onclick="deletarLead(${l.id})">🗑️ Excluir</button>
-        </td>
+         </td>
       </tr>
     `).join('');
   }
