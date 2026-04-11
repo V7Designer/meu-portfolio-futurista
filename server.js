@@ -39,6 +39,20 @@ db.exec(`CREATE TABLE IF NOT EXISTS admin (
     password TEXT NOT NULL
 )`);
 
+// Tabela de promoções
+db.exec(`CREATE TABLE IF NOT EXISTS promocoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    descricao TEXT,
+    preco_original TEXT,
+    preco_promocional TEXT,
+    bonus TEXT,
+    data_validade DATETIME,
+    ativo INTEGER DEFAULT 1,
+    cor_destaque TEXT DEFAULT '#ff3366',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Inserir admin padrão
 const admin = db.prepare("SELECT COUNT(*) as count FROM admin WHERE username = 'admin'").get();
 if (admin.count === 0) {
@@ -47,7 +61,33 @@ if (admin.count === 0) {
     console.log('✅ Admin criado: admin / Vini@Futuro2026#Secure');
 }
 
-// ROTAS PÚBLICAS
+// Inserir promoção de exemplo
+const promocao = db.prepare("SELECT COUNT(*) as count FROM promocoes").get();
+if (promocao.count === 0) {
+    const validade = new Date();
+    validade.setDate(validade.getDate() + 2); // 2 dias de validade
+    db.prepare(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, ativo) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+        '🔥 PROMOÇÃO RELÂMPAGO 🔥',
+        'Aproveite o desconto especial para os primeiros clientes!',
+        'R$ 800',
+        'R$ 450',
+        '+ 1 mês de suporte gratuito',
+        validade.toISOString(),
+        1
+    );
+    console.log('✅ Promoção exemplo criada!');
+}
+
+// ========== ROTAS PÚBLICAS ==========
+app.get('/api/promocao/ativa', (req, res) => {
+    const agora = new Date().toISOString();
+    const promocao = db.prepare(`SELECT * FROM promocoes 
+        WHERE ativo = 1 AND data_validade > ? 
+        ORDER BY created_at DESC LIMIT 1`).get(agora);
+    res.json(promocao || null);
+});
+
 app.post('/api/contato', (req, res) => {
     const { nome, email, telefone, mensagem } = req.body;
     if (!nome || !email || !mensagem) {
@@ -73,7 +113,7 @@ app.get('/api/projetos', (req, res) => {
     res.json(projetos);
 });
 
-// ROTAS ADMIN
+// ========== ROTAS ADMIN ==========
 function verifyToken(req, res, next) {
     const token = req.headers['authorization'];
     if (!token) return res.status(403).json({ error: 'Token não fornecido' });
@@ -94,6 +134,36 @@ app.post('/api/admin/login', (req, res) => {
     res.json({ token });
 });
 
+// CRUD de Promoções
+app.get('/api/admin/promocoes', verifyToken, (req, res) => {
+    const promocoes = db.prepare("SELECT * FROM promocoes ORDER BY created_at DESC").all();
+    res.json(promocoes);
+});
+
+app.post('/api/admin/promocoes', verifyToken, (req, res) => {
+    const { titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque } = req.body;
+    try {
+        const stmt = db.prepare(`INSERT INTO promocoes 
+            (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque, ativo) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1)`);
+        const result = stmt.run(titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque || '#ff3366');
+        res.json({ id: result.lastInsertRowid, message: 'Promoção criada com sucesso!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/admin/promocoes/:id', verifyToken, (req, res) => {
+    const { ativo } = req.body;
+    db.prepare("UPDATE promocoes SET ativo = ? WHERE id = ?").run(ativo, req.params.id);
+    res.json({ message: 'Status da promoção atualizado!' });
+});
+
+app.delete('/api/admin/promocoes/:id', verifyToken, (req, res) => {
+    db.prepare("DELETE FROM promocoes WHERE id = ?").run(req.params.id);
+    res.json({ message: 'Promoção excluída!' });
+});
+
 app.get('/api/admin/leads', verifyToken, (req, res) => {
     const leads = db.prepare("SELECT * FROM leads ORDER BY data DESC").all();
     res.json(leads);
@@ -101,17 +171,13 @@ app.get('/api/admin/leads', verifyToken, (req, res) => {
 
 app.delete('/api/admin/leads/:id', verifyToken, (req, res) => {
     const result = db.prepare("DELETE FROM leads WHERE id = ?").run(req.params.id);
-    if (result.changes === 0) {
-        return res.status(404).json({ error: 'Lead não encontrado' });
-    }
+    if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
     res.json({ message: 'Lead excluído com sucesso' });
 });
 
 app.put('/api/admin/leads/:id/finalizar', verifyToken, (req, res) => {
     const result = db.prepare("UPDATE leads SET status = 'finalizado' WHERE id = ?").run(req.params.id);
-    if (result.changes === 0) {
-        return res.status(404).json({ error: 'Lead não encontrado' });
-    }
+    if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
     res.json({ message: 'Lead finalizado com sucesso' });
 });
 

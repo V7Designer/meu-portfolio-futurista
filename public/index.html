@@ -437,6 +437,124 @@
             font-size: 1.8rem;
             color: white;
         }
+
+        /* Banner de Promoção */
+        .promo-banner {
+            background: linear-gradient(135deg, #ff3366, #ff0066);
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 900px;
+            text-align: center;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 0 30px rgba(255,51,102,0.5);
+        }
+
+        .promo-banner:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 50px rgba(255,51,102,0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+        }
+
+        .promo-titulo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .promo-precos {
+            font-size: 1.4rem;
+            margin: 10px 0;
+        }
+
+        .preco-antigo {
+            text-decoration: line-through;
+            opacity: 0.8;
+            margin-right: 15px;
+        }
+
+        .preco-novo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: #fff;
+            color: #ff3366;
+            padding: 5px 15px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .promo-bonus {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .promo-timer {
+            font-family: monospace;
+            font-size: 1.3rem;
+            background: rgba(0,0,0,0.3);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+        .promo-titulo { font-size: 1.2rem; }
+        .preco-novo { font-size: 1.3rem; }
+        .promo-precos { font-size: 1rem; }
+        }
+        /* Footer styles */
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.footer-section h4 {
+    color: #00ffff;
+    margin-bottom: 15px;
+}
+
+.footer-section p {
+    margin: 10px 0;
+    opacity: 0.8;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-links a {
+    color: white;
+    font-size: 1.5rem;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    color: #00ffff;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #00ffff22;
+}
     </style>
 </head>
 <body>
@@ -444,20 +562,33 @@
     <div class="cyber-grid"></div>
     <div class="particles" id="particles"></div>
 
-    <header class="header">
-        <div class="container">
-            <nav class="nav">
-                <div class="logo">VINI<span style="color:#00ffff;">.DEV</span></div>
-                <ul class="nav-links">
-                    <li><a href="#home">Início</a></li>
-                    <li><a href="#projetos">Projetos</a></li>
-                    <li><a href="#planos">Planos</a></li>
-                    <li><a href="#contato">Contato</a></li>
-                    <li><a href="admin.html" target="_blank">Admin</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">VINI<span style="color:#00ffff;">.DEV</span></div>
+            <ul class="nav-links">
+                <li><a href="#home">Início</a></li>
+                <li><a href="#projetos">Projetos</a></li>
+                <li><a href="#planos">Planos</a></li>
+                <li><a href="#contato">Contato</a></li>
+                <li><a href="admin.html" target="_blank">Admin</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="promo-banner" style="display: none;" class="promo-banner">
+    <div class="promo-titulo" id="promo-titulo"></div>
+    <div class="promo-descricao" id="promo-descricao"></div>
+    <div class="promo-precos">
+        <span class="preco-antigo" id="preco-antigo"></span>
+        <span class="preco-novo" id="preco-novo"></span>
+    </div>
+    <div class="promo-bonus" id="promo-bonus"></div>
+    <div class="promo-timer">
+        ⏱️ Termina em: <span id="promo-timer"></span>
+    </div>
+</div>
 
     <section id="home" class="hero">
         <div class="hero-content">
@@ -657,6 +788,55 @@
         });
 
         loadProjects();
+        
+// ========== SISTEMA DE PROMOÇÃO ==========
+async function carregarPromocao() {
+    try {
+        const res = await fetch('/api/promocao/ativa');
+        const promocao = await res.json();
+        
+        if (promocao && promocao.ativo === 1) {
+            document.getElementById('promo-banner').style.display = 'block';
+            document.getElementById('promo-titulo').innerHTML = promocao.titulo;
+            document.getElementById('promo-descricao').innerHTML = promocao.descricao;
+            document.getElementById('preco-antigo').innerHTML = promocao.preco_original;
+            document.getElementById('preco-novo').innerHTML = promocao.preco_promocional;
+            document.getElementById('promo-bonus').innerHTML = promocao.bonus;
+            
+            // Timer regressivo
+            const validade = new Date(promocao.data_validade);
+            atualizarTimer(validade);
+            
+            // Atualizar timer a cada segundo
+            setInterval(() => atualizarTimer(validade), 1000);
+        } else {
+            document.getElementById('promo-banner').style.display = 'none';
+        }
+    } catch(err) {
+        console.log('Erro ao carregar promoção:', err);
+    }
+}
+
+function atualizarTimer(validade) {
+    const agora = new Date();
+    const diff = validade - agora;
+    
+    if (diff <= 0) {
+        document.getElementById('promo-timer').innerHTML = "EXPIRADA!";
+        document.getElementById('promo-banner').style.display = 'none';
+        return;
+    }
+    
+    const horas = Math.floor(diff / (1000 * 60 * 60));
+    const minutos = Math.floor((diff % (3600000)) / 60000);
+    const segundos = Math.floor((diff % 60000) / 1000);
+    
+    document.getElementById('promo-timer').innerHTML = 
+        `${horas}h ${minutos}m ${segundos}s`;
+}
+
+// Chamar ao carregar a página
+carregarPromocao();
     </script>
 </body>
 </html>

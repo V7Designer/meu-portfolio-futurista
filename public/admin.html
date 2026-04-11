@@ -21,30 +21,51 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { padding: 12px; text-align: left; border-bottom: 1px solid #374151; vertical-align: top; }
     th { background: #1f2937; color: #00ffff; }
-    /* CORREÇÃO: Quebra de linha para mensagens longas */
-    td {
-        word-break: break-word;
-        white-space: normal;
-        max-width: 300px;
-    }
-    .mensagem-cell {
-        max-width: 300px;
-        word-wrap: break-word;
-        white-space: normal;
-        line-height: 1.4;
-    }
+    td { word-break: break-word; white-space: normal; max-width: 300px; }
+    .mensagem-cell { max-width: 300px; word-wrap: break-word; white-space: normal; line-height: 1.4; }
     .logout-btn { background: #ff0044; padding: 8px 20px; border: none; border-radius: 10px; cursor: pointer; }
     .tab { background: #1f2937; padding: 10px 20px; border: none; margin: 5px; border-radius: 10px; cursor: pointer; color: white; }
     .tab.active { background: #00ffff; color: #000; }
     .tab-content { display: none; padding: 20px; }
     .tab-content.active { display: block; }
     .btn-delete { background: #ff0044; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: white; transition: 0.2s; }
-    .btn-delete:hover { background: #cc0033; transform: scale(1.05); }
+    .btn-delete:hover { background: #cc0033; }
+    .btn-success { background: #00aa44; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; color: white; }
+    .btn-primary { background: linear-gradient(90deg, #00ffff, #0066ff); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; color: #000; font-weight: bold; }
     .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
     .status-finalizado { background: #00aa44; }
     .status-pendente { background: #ff8800; }
     .btn-finalizar { background: #00aa44; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; color: white; margin-right: 5px; }
     .btn-finalizar:hover { background: #008833; }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+    .modal-content {
+        background: #111827;
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid #00ffff;
+        max-width: 500px;
+        width: 90%;
+    }
+    .modal-content input, .modal-content textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 8px;
+        color: white;
+    }
     @media (max-width: 768px) { 
         th, td { font-size: 0.7rem; padding: 6px; } 
         .btn-delete, .btn-finalizar { padding: 3px 8px; font-size: 0.65rem; }
@@ -59,24 +80,53 @@
   <input type="password" id="password" placeholder="Senha" value="Vini@Futuro2026#Secure">
   <button onclick="login()">Acessar Nível 5</button>
 </div>
+
 <div id="dashboard" class="dashboard">
   <div class="admin-header">
     <h2><i class="fas fa-chart-line"></i> Painel de Controle - Futurista</h2>
     <button class="logout-btn" onclick="logout()">Sair</button>
   </div>
   <div class="stats" id="stats"></div>
+  
   <div style="padding: 0 20px;">
     <button class="tab active" onclick="showTab('leads')">📩 Leads / Pedidos</button>
+    <button class="tab" onclick="showTab('promocoes')">🎯 Promoções</button>
   </div>
+  
   <div id="leads" class="tab-content active">
     <div style="overflow-x:auto;">
       <table id="leads-table">
-        <thead>
-          <tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Mensagem</th><th>Status</th><th>Data</th><th>Ações</th></tr>
-        </thead>
+        <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Mensagem</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
+  </div>
+  
+  <div id="promocoes" class="tab-content">
+    <button class="btn-primary" onclick="abrirModalPromocao()" style="margin-bottom: 20px;">+ Criar Nova Promoção</button>
+    <div style="overflow-x:auto;">
+      <table id="promocoes-table">
+        <thead><tr><th>ID</th><th>Título</th><th>De</th><th>Por</th><th>Bônus</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Promoção -->
+<div id="modalPromocao" class="modal">
+  <div class="modal-content">
+    <h3>🎯 Criar Promoção Relâmpago</h3>
+    <input type="hidden" id="promocao-id">
+    <input type="text" id="promocao-titulo" placeholder="Título (ex: 🔥 BLACK FRIDAY 🔥)">
+    <textarea id="promocao-descricao" placeholder="Descrição da promoção..." rows="2"></textarea>
+    <input type="text" id="promocao-preco-original" placeholder="Preço original (ex: R$ 800)">
+    <input type="text" id="promocao-preco-promo" placeholder="Preço promocional (ex: R$ 450)">
+    <input type="text" id="promocao-bonus" placeholder="Bônus (ex: + 1 mês de suporte grátis)">
+    <input type="datetime-local" id="promocao-validade">
+    <input type="color" id="promocao-cor" value="#ff3366">
+    <button class="btn-success" onclick="salvarPromocao()" style="width:100%; margin-top:10px;">Salvar Promoção</button>
+    <button onclick="fecharModalPromocao()" style="width:100%; margin-top:10px; padding:10px; background:#374151; border:none; border-radius:8px; color:white; cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -119,6 +169,7 @@
     `;
     
     await carregarLeads();
+    await carregarPromocoes();
   }
   
   async function carregarLeads() {
@@ -126,17 +177,14 @@
     const leads = await res.json();
     document.querySelector('#leads-table tbody').innerHTML = leads.map(l => `
       <tr>
-        <td>${l.id}</td>
-        <td>${l.nome}</td>
-        <td>${l.email}</td>
-        <td>${l.telefone || '-'}</td>
+        <td>${l.id}</td><td>${l.nome}</td><td>${l.email}</td><td>${l.telefone || '-'}</td>
         <td class="mensagem-cell">${l.mensagem}</td>
         <td><span class="status-badge ${l.status === 'finalizado' ? 'status-finalizado' : 'status-pendente'}">${l.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}</span></td>
         <td>${new Date(l.data).toLocaleString()}</td>
         <td>
           ${l.status !== 'finalizado' ? `<button class="btn-finalizar" onclick="finalizarLead(${l.id})">✓ Finalizar</button>` : ''}
           <button class="btn-delete" onclick="deletarLead(${l.id})">🗑️ Excluir</button>
-         </td>
+        </td>
       </tr>
     `).join('');
   }
@@ -159,6 +207,79 @@
     });
     carregarLeads();
     loadDashboard();
+  }
+  
+  // ========== FUNÇÕES DE PROMOÇÕES ==========
+  async function carregarPromocoes() {
+    const res = await fetch('/api/admin/promocoes', { headers: { 'Authorization': `Bearer ${token}` } });
+    const promocoes = await res.json();
+    document.querySelector('#promocoes-table tbody').innerHTML = promocoes.map(p => `
+      <tr>
+        <td>${p.id}</td><td>${p.titulo}</td><td>${p.preco_original}</td>
+        <td><span style="color:#ff3366; font-weight:bold;">${p.preco_promocional}</span></td>
+        <td>${p.bonus || '-'}</td><td>${new Date(p.data_validade).toLocaleString()}</td>
+        <td>${p.ativo === 1 ? '<span class="status-badge status-pendente">✅ Ativa</span>' : '<span class="status-badge status-finalizado">⛔ Inativa</span>'}</td>
+        <td>
+          <button class="btn-finalizar" onclick="togglePromocao(${p.id}, ${p.ativo})">${p.ativo === 1 ? 'Desativar' : 'Ativar'}</button>
+          <button class="btn-delete" onclick="deletarPromocao(${p.id})">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  function abrirModalPromocao() {
+    document.getElementById('modalPromocao').style.display = 'flex';
+    document.getElementById('promocao-id').value = '';
+    document.getElementById('promocao-titulo').value = '';
+    document.getElementById('promocao-descricao').value = '';
+    document.getElementById('promocao-preco-original').value = '';
+    document.getElementById('promocao-preco-promo').value = '';
+    document.getElementById('promocao-bonus').value = '';
+    const data = new Date();
+    data.setDate(data.getDate() + 2);
+    document.getElementById('promocao-validade').value = data.toISOString().slice(0, 16);
+  }
+  
+  function fecharModalPromocao() {
+    document.getElementById('modalPromocao').style.display = 'none';
+  }
+  
+  async function salvarPromocao() {
+    const promocao = {
+      titulo: document.getElementById('promocao-titulo').value,
+      descricao: document.getElementById('promocao-descricao').value,
+      preco_original: document.getElementById('promocao-preco-original').value,
+      preco_promocional: document.getElementById('promocao-preco-promo').value,
+      bonus: document.getElementById('promocao-bonus').value,
+      data_validade: document.getElementById('promocao-validade').value,
+      cor_destaque: document.getElementById('promocao-cor').value
+    };
+    await fetch('/api/admin/promocoes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(promocao)
+    });
+    fecharModalPromocao();
+    carregarPromocoes();
+  }
+  
+  async function togglePromocao(id, ativoAtual) {
+    const novoStatus = ativoAtual === 1 ? 0 : 1;
+    await fetch(`/api/admin/promocoes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ ativo: novoStatus })
+    });
+    carregarPromocoes();
+  }
+  
+  async function deletarPromocao(id) {
+    if (!confirm('Excluir esta promoção permanentemente?')) return;
+    await fetch(`/api/admin/promocoes/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    carregarPromocoes();
   }
   
   function showTab(tab) { 
