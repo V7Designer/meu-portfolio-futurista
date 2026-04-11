@@ -691,15 +691,15 @@
         </div>
     </div>
 
-    <!-- Modal Projeto -->
-    <div id="projectModal" class="modal">
-        <div class="modal-content">
-            <h3 id="project-name"></h3>
-            <p id="project-desc" style="margin: 15px 0;"></p>
-            <a href="#" id="project-link" target="_blank">Visitar Site →</a>
-            <button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;">Fechar</button>
-        </div>
+<!-- Modal Projeto -->
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <h3 id="project-name"></h3>
+        <p id="project-desc" style="margin: 15px 0;"></p>
+        <a href="#" id="project-link" target="_blank" rel="noopener noreferrer">Visitar Site →</a>
+        <button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;">Fechar</button>
     </div>
+</div>
 
     <!-- Botão do Instagram -->
     <div class="instagram-float" onclick="window.open('https://www.instagram.com/vini.wdev/', '_blank')">
@@ -746,10 +746,37 @@
             }
         }
 
-        function openProjectModal(id, nome, desc, link) {
-            document.getElementById('project-name').innerText = nome;
-            document.getElementById('project-desc').innerText = desc;
-            document.getElementById('project-link').href = link;
+function openProjectModal(id, nome, desc, link) {
+    document.getElementById('project-name').innerText = nome;
+    document.getElementById('project-desc').innerText = desc;
+    
+    // Verifica se o link é válido
+    if (!link || link === 'https://' || link === '') {
+        document.getElementById('project-link').innerHTML = '⚠️ Link indisponível';
+        document.getElementById('project-link').href = '#';
+        document.getElementById('project-link').style.opacity = '0.5';
+        document.getElementById('project-link').style.cursor = 'not-allowed';
+    } else {
+        let linkCorrigido = link;
+        if (!linkCorrigido.startsWith('http')) {
+            linkCorrigido = 'https://' + linkCorrigido;
+        }
+        document.getElementById('project-link').innerHTML = 'Visitar Site →';
+        document.getElementById('project-link').href = linkCorrigido;
+        document.getElementById('project-link').style.opacity = '1';
+        document.getElementById('project-link').style.cursor = 'pointer';
+    }
+    
+    document.getElementById('projectModal').style.display = 'flex';
+}
+    
+    // CORREÇÃO: Garante que o link tenha https://
+    let linkCorrigido = link;
+    if (linkCorrigido && !linkCorrigido.startsWith('http')) {
+        linkCorrigido = 'https://' + linkCorrigido;
+    }
+    
+            document.getElementById('project-link').href = linkCorrigido;
             document.getElementById('projectModal').style.display = 'flex';
         }
 
