@@ -7,561 +7,72 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Space Grotesk', monospace;
-            background: #050a15;
-            color: #ffffff;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* Fundo fixo SEM animação pesada */
-        .cyber-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle at 20% 50%, #0a0f2a, #03060c);
-        }
-
-        /* Grid estático (sem animação) - MELHORIA DE FPS */
-        .cyber-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: 
-                linear-gradient(#00ffff11 1px, transparent 1px),
-                linear-gradient(90deg, #00ffff11 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.5;
-        }
-
-        /* Partículas REDUZIDAS (menos elementos = mais FPS) */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: #00ffff;
-            border-radius: 50%;
-            opacity: 0.2;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); }
-            50% { transform: translateY(-80px) translateX(40px); }
-        }
-
-        /* Container do nome com sobreposição */
-        .name-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .name-back {
-            font-size: 7rem;
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.05);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            letter-spacing: 8px;
-        }
-
-        .name-front {
-            font-size: 5rem;
-            font-weight: 800;
-            color: #ffffff;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-        }
-
-        /* Glitch APENAS no hover (melhora FPS) */
-        .glitch {
-            font-size: 1.2rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            color: #00ffff;
-        }
-
-        /* Container principal */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-
-        /* Header fixo com blur (leve) */
-        .header {
-            padding: 20px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            background: rgba(5, 10, 21, 0.9);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #00ffff33;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #00ffff, #0066ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            transition: 0.3s;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            color: #00ffff;
-        }
-
-        /* Hero section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding-top: 80px;
-        }
-
-        .hero-content h1 {
-            margin-bottom: 20px;
-        }
-
-        .hero-content p {
-            font-size: 1.1rem;
-            color: #aaa;
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-
-        /* Botões com transição suave (sem transform pesado) */
-        .btn-primary {
-            display: inline-block;
-            padding: 14px 35px;
-            background: linear-gradient(90deg, #00ffff, #0066ff);
-            border: none;
-            border-radius: 50px;
-            color: #000;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.2s;
-            margin: 8px;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 15px #00ffff;
-        }
-
-        .btn-outline {
-            display: inline-block;
-            padding: 14px 35px;
-            background: transparent;
-            border: 2px solid #00ffff;
-            border-radius: 50px;
-            color: #00ffff;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.2s;
-            margin: 8px;
-        }
-
-        .btn-outline:hover {
-            background: #00ffff22;
-        }
-
-        /* Seções */
-        .section {
-            padding: 80px 0;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 50px;
-            background: linear-gradient(135deg, #fff, #00ffff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Cards de projetos com hover mais leve */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
-            background: rgba(15, 25, 45, 0.6);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid #00ffff33;
-            transition: 0.3s ease;
-            cursor: pointer;
-        }
-
-        .project-card:hover {
-            transform: translateY(-8px);
-            border-color: #00ffff;
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
-        }
-
-        .project-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: 0.3s;
-        }
-
-        .project-card:hover img {
-            transform: scale(1.02);
-        }
-
-        .project-info {
-            padding: 20px;
-        }
-
-        .project-info h3 {
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-        }
-
-        .project-info p {
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .btn-view {
-            background: transparent;
-            border: 1px solid #00ffff;
-            padding: 6px 18px;
-            border-radius: 30px;
-            color: #00ffff;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .btn-view:hover {
-            background: #00ffff;
-            color: #000;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #0a0f2a, #050a15);
-            padding: 35px;
-            border-radius: 24px;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid #00ffff;
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-content a {
-            display: inline-block;
-            margin-top: 20px;
-            background: #00ffff;
-            color: #000;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        /* Formulário */
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #00ffff33;
-            border-radius: 12px;
-            color: white;
-            font-size: 0.95rem;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #00ffff;
-        }
-
-        /* WhatsApp float */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            background: #25d366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            transition: 0.2s;
-            box-shadow: 0 0 15px #25d36688;
-        }
-
-        .whatsapp-float:hover {
-            transform: scale(1.05);
-        }
-
-        .whatsapp-float i {
-            font-size: 1.8rem;
-            color: white;
-        }
-
-        /* Footer */
-        .footer {
-            background: #03060c;
-            padding: 35px 0;
-            text-align: center;
-            border-top: 1px solid #00ffff22;
-        }
-
-        /* Responsivo */
-        @media (max-width: 768px) {
-            .name-front, .name-back { font-size: 2.5rem; }
-            .hero-content p { font-size: 0.9rem; }
-            .container { padding: 0 20px; }
-            .nav-links { display: none; }
-            .section-title { font-size: 1.8rem; }
-            .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; }
-        }
-
-        /* Botões flutuantes - Instagram e WhatsApp */
-        .instagram-float, .whatsapp-float {
-            position: fixed;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            transition: 0.2s;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        }
-
-        .instagram-float {
-            bottom: 100px;
-            background: radial-gradient(circle at 30% 110%, #fdf497, #fdf497 25%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-        }
-
-        .whatsapp-float {
-            bottom: 30px;
-            background: #25d366;
-        }
-
-        .instagram-float:hover, .whatsapp-float:hover {
-            transform: scale(1.08);
-        }
-
-        .instagram-float i, .whatsapp-float i {
-            font-size: 1.8rem;
-            color: white;
-        }
-
-        /* Banner de Promoção */
-        .promo-banner {
-            background: linear-gradient(135deg, #ff3366, #ff0066);
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin: 20px auto;
-            max-width: 900px;
-            text-align: center;
-            animation: pulse 2s infinite;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 30px rgba(255,51,102,0.5);
-            margin-top: 100px;
-        }
-
-        .promo-banner:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 50px rgba(255,51,102,0.8);
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.01); }
-        }
-
-        .promo-titulo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .promo-precos {
-            font-size: 1.4rem;
-            margin: 10px 0;
-        }
-
-        .preco-antigo {
-            text-decoration: line-through;
-            opacity: 0.8;
-            margin-right: 15px;
-        }
-
-        .preco-novo {
-            font-size: 2rem;
-            font-weight: 800;
-            background: #fff;
-            color: #ff3366;
-            padding: 5px 15px;
-            border-radius: 50px;
-            display: inline-block;
-        }
-
-        .promo-bonus {
-            background: rgba(255,255,255,0.2);
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 50px;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        .promo-timer {
-            font-family: monospace;
-            font-size: 1.3rem;
-            background: rgba(0,0,0,0.3);
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 50px;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 768px) {
-        .promo-titulo { font-size: 1.2rem; }
-        .preco-novo { font-size: 1.3rem; }
-        .promo-precos { font-size: 1rem; }
-        .promo-banner {
-            margin-top: 70px;
-            margin-left: 10px;
-            margin-right:10px;
-        }
-    }
-    
-        /* Footer styles */
-.footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-bottom: 40px;
-    text-align: left;
-}
-
-.footer-section h4 {
-    color: #00ffff;
-    margin-bottom: 15px;
-}
-
-.footer-section p {
-    margin: 10px 0;
-    opacity: 0.8;
-}
-
-.social-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.social-links a {
-    color: white;
-    font-size: 1.5rem;
-    transition: 0.3s;
-}
-
-.social-links a:hover {
-    color: #00ffff;
-}
-
-.footer-bottom {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #00ffff22;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', monospace; background: #050a15; color: #ffffff; overflow-x: hidden; line-height: 1.6; }
+        .cyber-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 20% 50%, #0a0f2a, #03060c); }
+        .cyber-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(#00ffff11 1px, transparent 1px), linear-gradient(90deg, #00ffff11 1px, transparent 1px); background-size: 50px 50px; opacity: 0.5; }
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .particle { position: absolute; background: #00ffff; border-radius: 50%; opacity: 0.2; animation: float 20s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0); } 50% { transform: translateY(-80px) translateX(40px); } }
+        .name-container { position: relative; display: inline-block; }
+        .name-back { font-size: 7rem; font-weight: 800; color: rgba(255, 255, 255, 0.05); position: absolute; top: 0; left: 0; width: 100%; text-align: center; letter-spacing: 8px; }
+        .name-front { font-size: 5rem; font-weight: 800; color: #ffffff; position: relative; z-index: 1; text-shadow: 0 0 30px rgba(0, 255, 255, 0.3); }
+        .glitch { font-size: 1.2rem; font-weight: 500; letter-spacing: 2px; color: #00ffff; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+        .header { padding: 20px 0; position: fixed; width: 100%; top: 0; z-index: 1000; background: rgba(5, 10, 21, 0.9); backdrop-filter: blur(8px); border-bottom: 1px solid #00ffff33; }
+        .nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #00ffff, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .nav-links { display: flex; gap: 25px; list-style: none; }
+        .nav-links a { color: #fff; text-decoration: none; transition: 0.3s; font-weight: 500; }
+        .nav-links a:hover { color: #00ffff; }
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 80px; }
+        .hero-content p { font-size: 1.1rem; color: #aaa; max-width: 600px; margin: 0 auto 30px; }
+        .btn-primary { display: inline-block; padding: 14px 35px; background: linear-gradient(90deg, #00ffff, #0066ff); border: none; border-radius: 50px; color: #000; font-weight: bold; text-decoration: none; transition: 0.2s; margin: 8px; cursor: pointer; }
+        .btn-primary:hover { opacity: 0.9; box-shadow: 0 0 15px #00ffff; }
+        .btn-outline { display: inline-block; padding: 14px 35px; background: transparent; border: 2px solid #00ffff; border-radius: 50px; color: #00ffff; font-weight: bold; text-decoration: none; transition: 0.2s; margin: 8px; }
+        .btn-outline:hover { background: #00ffff22; }
+        .section { padding: 80px 0; }
+        .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 50px; background: linear-gradient(135deg, #fff, #00ffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .project-card { background: rgba(15, 25, 45, 0.6); backdrop-filter: blur(8px); border-radius: 20px; overflow: hidden; border: 1px solid #00ffff33; transition: 0.3s ease; cursor: pointer; }
+        .project-card:hover { transform: translateY(-8px); border-color: #00ffff; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15); }
+        .project-card img { width: 100%; height: 200px; object-fit: cover; transition: 0.3s; }
+        .project-card:hover img { transform: scale(1.02); }
+        .project-info { padding: 20px; }
+        .project-info h3 { font-size: 1.3rem; margin-bottom: 8px; }
+        .project-info p { color: #aaa; font-size: 0.9rem; margin-bottom: 15px; }
+        .btn-view { background: transparent; border: 1px solid #00ffff; padding: 6px 18px; border-radius: 30px; color: #00ffff; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
+        .btn-view:hover { background: #00ffff; color: #000; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(12px); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: linear-gradient(135deg, #0a0f2a, #050a15); padding: 35px; border-radius: 24px; max-width: 450px; width: 90%; text-align: center; border: 1px solid #00ffff; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-content a { display: inline-block; margin-top: 20px; background: #00ffff; color: #000; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; }
+        .form-group { margin-bottom: 18px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid #00ffff33; border-radius: 12px; color: white; font-size: 0.95rem; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00ffff; }
+        .footer { background: #03060c; padding: 35px 0; text-align: center; border-top: 1px solid #00ffff22; }
+        .instagram-float, .whatsapp-float { position: fixed; right: 25px; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.2s; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+        .instagram-float { bottom: 100px; background: radial-gradient(circle at 30% 110%, #fdf497, #fdf497 25%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .whatsapp-float { bottom: 30px; background: #25d366; }
+        .instagram-float:hover, .whatsapp-float:hover { transform: scale(1.08); }
+        .instagram-float i, .whatsapp-float i { font-size: 1.8rem; color: white; }
+        .promo-banner { background: linear-gradient(135deg, #ff3366, #ff0066); padding: 15px 20px; border-radius: 15px; margin: 100px auto 20px; max-width: 900px; text-align: center; animation: pulse 2s infinite; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 30px rgba(255,51,102,0.5); }
+        .promo-banner:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,51,102,0.8); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
+        .promo-titulo { font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .promo-precos { font-size: 1.4rem; margin: 10px 0; }
+        .preco-antigo { text-decoration: line-through; opacity: 0.8; margin-right: 15px; }
+        .preco-novo { font-size: 2rem; font-weight: 800; background: #fff; color: #ff3366; padding: 5px 15px; border-radius: 50px; display: inline-block; }
+        .promo-bonus { background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 15px; border-radius: 50px; margin-top: 10px; font-weight: 600; }
+        .promo-timer { font-family: monospace; font-size: 1.3rem; background: rgba(0,0,0,0.3); display: inline-block; padding: 5px 15px; border-radius: 50px; margin-top: 10px; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; text-align: left; }
+        .footer-section h4 { color: #00ffff; margin-bottom: 15px; }
+        .footer-section p { margin: 10px 0; opacity: 0.8; }
+        .social-links { display: flex; gap: 15px; margin-top: 15px; }
+        .social-links a { color: white; font-size: 1.5rem; transition: 0.3s; }
+        .social-links a:hover { color: #00ffff; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #00ffff22; }
+        @media (max-width: 768px) { .name-front, .name-back { font-size: 2.5rem; } .hero-content p { font-size: 0.9rem; } .container { padding: 0 20px; } .nav-links { display: none; } .section-title { font-size: 1.8rem; } .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; } .promo-banner { margin-top: 70px; margin-left: 10px; margin-right: 10px; } .promo-titulo { font-size: 1.2rem; } .preco-novo { font-size: 1.3rem; } .promo-precos { font-size: 1rem; } }
     </style>
 </head>
 <body>
@@ -569,150 +80,52 @@
     <div class="cyber-grid"></div>
     <div class="particles" id="particles"></div>
 
-<header class="header">
-    <div class="container">
-        <nav class="nav">
-            <div class="logo">VINI<span style="color:#00ffff;">.DEV</span></div>
-            <ul class="nav-links">
-                <li><a href="#home">Início</a></li>
-                <li><a href="#projetos">Projetos</a></li>
-                <li><a href="#planos">Planos</a></li>
-                <li><a href="#contato">Contato</a></li>
-                <li><a href="admin.html" target="_blank">Admin</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">VINI<span style="color:#00ffff;">.DEV</span></div>
+                <ul class="nav-links">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#projetos">Projetos</a></li>
+                    <li><a href="#planos">Planos</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                    <li><a href="admin.html" target="_blank">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<div id="promo-banner" style="display: none;" class="promo-banner">
-    <div class="promo-titulo" id="promo-titulo"></div>
-    <div class="promo-descricao" id="promo-descricao"></div>
-    <div class="promo-precos">
-        <span class="preco-antigo" id="preco-antigo"></span>
-        <span class="preco-novo" id="preco-novo"></span>
+    <div id="promo-banner" style="display: none;" class="promo-banner">
+        <div class="promo-titulo" id="promo-titulo"></div>
+        <div class="promo-descricao" id="promo-descricao"></div>
+        <div class="promo-precos"><span class="preco-antigo" id="preco-antigo"></span><span class="preco-novo" id="preco-novo"></span></div>
+        <div class="promo-bonus" id="promo-bonus"></div>
+        <div class="promo-timer">⏱️ Termina em: <span id="promo-timer"></span></div>
     </div>
-    <div class="promo-bonus" id="promo-bonus"></div>
-    <div class="promo-timer">
-        ⏱️ Termina em: <span id="promo-timer"></span>
-    </div>
-</div>
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <div class="name-container">
-                <div class="name-back">VINICIUS</div>
-                <div class="name-front">Vinícius</div>
-            </div>
+            <div class="name-container"><div class="name-back">VINICIUS</div><div class="name-front">Vinícius</div></div>
             <div class="glitch">// FULLSTACK DEVELOPER & FUTURISTIC DESIGNER</div>
             <p>Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.</p>
             <a href="#projetos" class="btn-primary">Explorar Portfólio</a>
             <a href="#contato" class="btn-outline">Começar Projeto</a>
         </div>
     </section>
- 
-    <section id="projetos" class="section">
-        <div class="container">
-            <h2 class="section-title">⚡ Projetos Revolucionários</h2>
-            <div class="projects-grid" id="projects-grid">Carregando...</div>
-        </div>
-    </section>
 
-    <section id="planos" class="section">
-        <div class="container">
-            <h2 class="section-title">💰 Planos Futuristas</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-info"><h3>🚀 Básico</h3><p>Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 800</p></div>
-                </div>
-                <div class="project-card">
-                    <div class="project-info"><h3>⚡ Completo</h3><p>Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.200</p></div>
-                </div>
-                <div class="project-card">
-                    <div class="project-info"><h3>🔥 Premium</h3><p>Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.800</p></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="projetos" class="section"><div class="container"><h2 class="section-title">⚡ Projetos Revolucionários</h2><div class="projects-grid" id="projects-grid">Carregando...</div></div></section>
+    <section id="planos" class="section"><div class="container"><h2 class="section-title">💰 Planos Futuristas</h2><div class="projects-grid"><div class="project-card"><div class="project-info"><h3>🚀 Básico</h3><p>Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 800</p></div></div><div class="project-card"><div class="project-info"><h3>⚡ Completo</h3><p>Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.200</p></div></div><div class="project-card"><div class="project-info"><h3>🔥 Premium</h3><p>Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.800</p></div></div></div></div></section>
+    <section id="contato" class="section"><div class="container"><h2 class="section-title">📡 Contato</h2><div style="max-width: 550px; margin: 0 auto;"><form id="contact-form"><div class="form-group"><input type="text" id="nome" placeholder="Seu nome" required></div><div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" required></div><div class="form-group"><input type="tel" id="telefone" placeholder="WhatsApp (opcional)"></div><div class="form-group"><textarea id="mensagem" rows="4" placeholder="Descreva seu projeto..." required></textarea></div><button type="submit" class="btn-primary" style="width:100%;">Enviar Mensagem</button></form></div></div></section>
 
-    <section id="contato" class="section">
-        <div class="container">
-            <h2 class="section-title">📡 Contato</h2>
-            <div style="max-width: 550px; margin: 0 auto;">
-                <form id="contact-form">
-                    <div class="form-group"><input type="text" id="nome" placeholder="Seu nome" required></div>
-                    <div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" required></div>
-                    <div class="form-group"><input type="tel" id="telefone" placeholder="WhatsApp (opcional)"></div>
-                    <div class="form-group"><textarea id="mensagem" rows="4" placeholder="Descreva seu projeto..." required></textarea></div>
-                    <button type="submit" class="btn-primary" style="width:100%;">Enviar Mensagem</button>
-                </form>
-            </div>
-        </div>
-    </section>
+    <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>Vinícius Tavares</h4><p>Criação de Sites Futuristas</p><div class="social-links"><a href="https://www.instagram.com/vini.wdev/" target="_blank"><i class="fab fa-instagram"></i></a><a href="https://wa.me/5583988655944" target="_blank"><i class="fab fa-whatsapp"></i></a><a href="mailto:vini-dev@zohomail.com"><i class="fas fa-envelope"></i></a></div></div><div class="footer-section"><h4>Contato Direto</h4><p><i class="fab fa-whatsapp"></i> (83) 98865-5944</p><p><i class="fas fa-envelope"></i> vini-dev@zohomail.com</p><p><i class="fab fa-instagram"></i> @vini.wdev</p></div><div class="footer-section"><h4>Links Rápidos</h4><p><a href="#projetos" style="color: white; text-decoration: none;">Projetos</a></p><p><a href="#planos" style="color: white; text-decoration: none;">Planos</a></p><p><a href="#contato" style="color: white; text-decoration: none;">Contato</a></p></div></div><div class="footer-bottom"><p>© 2026 Vinícius Tavares - Criando o futuro, um site por vez.</p><p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.6;">⚡ Tecnologia de ponta | Design futurista | Resultados reais</p></div></div></footer>
 
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>Vinícius Tavares</h4>
-                <p>Criação de Sites Futuristas</p>
-                <div class="social-links">
-                    <a href="https://www.instagram.com/vini.wdev/" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://wa.me/5583988655944" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    <a href="mailto:vini-dev@zohomail.com"><i class="fas fa-envelope"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Contato Direto</h4>
-                <p><i class="fab fa-whatsapp"></i> (83) 98865-5944</p>
-                <p><i class="fas fa-envelope"></i> vini-dev@zohomail.com</p>
-                <p><i class="fab fa-instagram"></i> @vini.wdev</p>
-            </div>
-            <div class="footer-section">
-                <h4>Links Rápidos</h4>
-                <p><a href="#projetos" style="color: white; text-decoration: none;">Projetos</a></p>
-                <p><a href="#planos" style="color: white; text-decoration: none;">Planos</a></p>
-                <p><a href="#contato" style="color: white; text-decoration: none;">Contato</a></p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 Vinícius Tavares - Criando o futuro, um site por vez.</p>
-            <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.6;">⚡ Tecnologia de ponta | Design futurista | Resultados reais</p>
-        </div>
-    </div>
-</footer>
+    <div id="modal" class="modal"><div class="modal-content"><i class="fas fa-check-circle" style="font-size: 3.5rem; color: #00ffff; margin-bottom: 15px;"></i><h3 id="modal-title">Mensagem Enviada!</h3><p id="modal-message">Em breve entrarei em contato.</p><button onclick="closeModal()" class="btn-primary" style="margin-top: 15px;">Fechar</button></div></div>
+    <div id="projectModal" class="modal"><div class="modal-content"><h3 id="project-name"></h3><p id="project-desc" style="margin: 15px 0;"></p><a href="#" id="project-link" target="_blank" rel="noopener noreferrer">Visitar Site →</a><button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;">Fechar</button></div></div>
 
-    <!-- Modal Geral -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #00ffff; margin-bottom: 15px;"></i>
-            <h3 id="modal-title">Mensagem Enviada!</h3>
-            <p id="modal-message">Em breve entrarei em contato.</p>
-            <button onclick="closeModal()" class="btn-primary" style="margin-top: 15px;">Fechar</button>
-        </div>
-    </div>
-
-<!-- Modal Projeto -->
-<div id="projectModal" class="modal">
-    <div class="modal-content">
-        <h3 id="project-name"></h3>
-        <p id="project-desc" style="margin: 15px 0;"></p>
-        <a href="#" id="project-link" target="_blank" rel="noopener noreferrer">Visitar Site →</a>
-        <button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;">Fechar</button>
-    </div>
-</div>
-
-    <!-- Botão do Instagram -->
-    <div class="instagram-float" onclick="window.open('https://www.instagram.com/vini.wdev/', '_blank')">
-        <i class="fab fa-instagram"></i>
-    </div>
-
-    <!-- Botão do WhatsApp -->
-    <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20fiquei%20interessado%20nos%20seus%20servi%C3%A7os.%20Pode%20me%20dar%20mais%20informa%C3%A7%C3%B5es%3F', '_blank')">
-        <i class="fab fa-whatsapp"></i>
-    </div>
+    <div class="instagram-float" onclick="window.open('https://www.instagram.com/vini.wdev/', '_blank')"><i class="fab fa-instagram"></i></div>
+    <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20fiquei%20interessado%20nos%20seus%20servi%C3%A7os.%20Pode%20me%20dar%20mais%20informa%C3%A7%C3%B5es%3F', '_blank')"><i class="fab fa-whatsapp"></i></div>
 
     <script>
-        // Partículas reduzidas (20 apenas - MELHOR FPS)
         for(let i = 0; i < 20; i++) {
             const particle = document.createElement('div');
             particle.classList.add('particle');
@@ -725,152 +138,49 @@
             document.getElementById('particles').appendChild(particle);
         }
 
-        // Carregar projetos
         async function loadProjects() {
             try {
                 const res = await fetch('/api/projetos');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const projetos = await res.json();
                 const grid = document.getElementById('projects-grid');
+                if (!projetos.length) { grid.innerHTML = '<p style="text-align:center;">Nenhum projeto encontrado.</p>'; return; }
                 grid.innerHTML = projetos.map(p => `
-                    <div class="project-card" onclick="openProjectModal(${p.id}, '${p.nome}', '${p.descricao}', '${p.link}')">
-                        <img src="${p.imagem}" alt="${p.nome}" loading="lazy">
-                        <div class="project-info">
-                            <h3>${p.nome}</h3>
-                            <p>${p.descricao}</p>
-                            <button class="btn-view">Ver Projeto →</button>
-                        </div>
+                    <div class="project-card" onclick="openProjectModal(${p.id}, \`${p.nome}\`, \`${p.descricao}\`, \`${p.link}\`)">
+                        <img src="${p.imagem || 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'}" alt="${p.nome}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'">
+                        <div class="project-info"><h3>${p.nome}</h3><p>${p.descricao}</p><button class="btn-view">Ver Projeto →</button></div>
                     </div>
                 `).join('');
-            } catch(err) {
-                document.getElementById('projects-grid').innerHTML = '<p style="text-align:center;">Erro ao carregar projetos</p>';
-            }
+            } catch(err) { console.error('Erro ao carregar projetos:', err); document.getElementById('projects-grid').innerHTML = '<p style="text-align:center;color:red;">Erro ao carregar projetos. Tente novamente mais tarde.</p>'; }
         }
 
-function openProjectModal(id, nome, desc, link) {
-    document.getElementById('project-name').innerText = nome;
-    document.getElementById('project-desc').innerText = desc;
-    
-    // Verifica se o link é válido
-    if (!link || link === 'https://' || link === '') {
-        document.getElementById('project-link').innerHTML = '⚠️ Link indisponível';
-        document.getElementById('project-link').href = '#';
-        document.getElementById('project-link').style.opacity = '0.5';
-        document.getElementById('project-link').style.cursor = 'not-allowed';
-    } else {
-        let linkCorrigido = link;
-        if (!linkCorrigido.startsWith('http')) {
-            linkCorrigido = 'https://' + linkCorrigido;
-        }
-        document.getElementById('project-link').innerHTML = 'Visitar Site →';
-        document.getElementById('project-link').href = linkCorrigido;
-        document.getElementById('project-link').style.opacity = '1';
-        document.getElementById('project-link').style.cursor = 'pointer';
-    }
-    
-    document.getElementById('projectModal').style.display = 'flex';
-}
-    
-    // CORREÇÃO: Garante que o link tenha https://
-    let linkCorrigido = link;
-    if (linkCorrigido && !linkCorrigido.startsWith('http')) {
-        linkCorrigido = 'https://' + linkCorrigido;
-    }
-    
-            document.getElementById('project-link').href = linkCorrigido;
+        function openProjectModal(id, nome, desc, link) {
+            document.getElementById('project-name').innerText = nome;
+            document.getElementById('project-desc').innerText = desc;
+            let linkCorrigido = (link && link !== 'https://') ? (link.startsWith('http') ? link : 'https://' + link) : '#';
+            const linkEl = document.getElementById('project-link');
+            if (linkCorrigido === '#') { linkEl.innerHTML = '⚠️ Link indisponível'; linkEl.href = '#'; linkEl.style.opacity = '0.5'; linkEl.style.cursor = 'not-allowed'; }
+            else { linkEl.innerHTML = 'Visitar Site →'; linkEl.href = linkCorrigido; linkEl.style.opacity = '1'; linkEl.style.cursor = 'pointer'; }
             document.getElementById('projectModal').style.display = 'flex';
         }
-
-        function closeProjectModal() {
-            document.getElementById('projectModal').style.display = 'none';
-        }
-
-        // Formulário de contato
+        function closeProjectModal() { document.getElementById('projectModal').style.display = 'none'; }
         document.getElementById('contact-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-            const telefone = document.getElementById('telefone').value;
-            const mensagem = document.getElementById('mensagem').value;
-
-            await fetch('/api/contato', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email, telefone, mensagem })
-            });
-
+            await fetch('/api/contato', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: document.getElementById('nome').value, email: document.getElementById('email').value, telefone: document.getElementById('telefone').value, mensagem: document.getElementById('mensagem').value }) });
             showModal('Mensagem Enviada!', 'Recebi sua mensagem e entrarei em contato em breve.');
             document.getElementById('contact-form').reset();
         });
-
-        function showModal(title, message) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-message').innerText = message;
-            document.getElementById('modal').style.display = 'flex';
+        function showModal(title, message) { document.getElementById('modal-title').innerText = title; document.getElementById('modal-message').innerText = message; document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => anchor.addEventListener('click', function(e) { e.preventDefault(); const target = document.querySelector(this.getAttribute('href')); if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+        
+        async function carregarPromocao() {
+            try { const res = await fetch('/api/promocao/ativa'); const promocao = await res.json();
+            if (promocao && promocao.ativo === 1) { document.getElementById('promo-banner').style.display = 'block'; document.getElementById('promo-titulo').innerHTML = promocao.titulo; document.getElementById('promo-descricao').innerHTML = promocao.descricao; document.getElementById('preco-antigo').innerHTML = promocao.preco_original; document.getElementById('preco-novo').innerHTML = promocao.preco_promocional; document.getElementById('promo-bonus').innerHTML = promocao.bonus; const validade = new Date(promocao.data_validade); const atualizarTimer = () => { const diff = validade - new Date(); if (diff <= 0) { document.getElementById('promo-timer').innerHTML = "EXPIRADA!"; document.getElementById('promo-banner').style.display = 'none'; return; } const horas = Math.floor(diff / (1000 * 60 * 60)); const minutos = Math.floor((diff % (3600000)) / 60000); const segundos = Math.floor((diff % 60000) / 1000); document.getElementById('promo-timer').innerHTML = `${horas}h ${minutos}m ${segundos}s`; }; atualizarTimer(); setInterval(atualizarTimer, 1000); } else document.getElementById('promo-banner').style.display = 'none';
+            } catch(err) { console.log('Erro ao carregar promoção:', err); }
         }
-
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        // Smooth scroll suave
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
-
         loadProjects();
-        
-// ========== SISTEMA DE PROMOÇÃO ==========
-async function carregarPromocao() {
-    try {
-        const res = await fetch('/api/promocao/ativa');
-        const promocao = await res.json();
-        
-        if (promocao && promocao.ativo === 1) {
-            document.getElementById('promo-banner').style.display = 'block';
-            document.getElementById('promo-titulo').innerHTML = promocao.titulo;
-            document.getElementById('promo-descricao').innerHTML = promocao.descricao;
-            document.getElementById('preco-antigo').innerHTML = promocao.preco_original;
-            document.getElementById('preco-novo').innerHTML = promocao.preco_promocional;
-            document.getElementById('promo-bonus').innerHTML = promocao.bonus;
-            
-            // Timer regressivo
-            const validade = new Date(promocao.data_validade);
-            atualizarTimer(validade);
-            
-            // Atualizar timer a cada segundo
-            setInterval(() => atualizarTimer(validade), 1000);
-        } else {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-    } catch(err) {
-        console.log('Erro ao carregar promoção:', err);
-    }
-}
-
-function atualizarTimer(validade) {
-    const agora = new Date();
-    const diff = validade - agora;
-    
-    if (diff <= 0) {
-        document.getElementById('promo-timer').innerHTML = "EXPIRADA!";
-        document.getElementById('promo-banner').style.display = 'none';
-        return;
-    }
-    
-    const horas = Math.floor(diff / (1000 * 60 * 60));
-    const minutos = Math.floor((diff % (3600000)) / 60000);
-    const segundos = Math.floor((diff % 60000) / 1000);
-    
-    document.getElementById('promo-timer').innerHTML = 
-        `${horas}h ${minutos}m ${segundos}s`;
-}
-
-// Chamar ao carregar a página
-carregarPromocao();
+        carregarPromocao();
     </script>
 </body>
 </html>
