@@ -402,6 +402,41 @@
             .section-title { font-size: 1.8rem; }
             .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; }
         }
+
+        /* Botões flutuantes - Instagram e WhatsApp */
+        .instagram-float, .whatsapp-float {
+            position: fixed;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.2s;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        .instagram-float {
+            bottom: 100px;
+            background: radial-gradient(circle at 30% 110%, #fdf497, #fdf497 25%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+        }
+
+        .whatsapp-float {
+            bottom: 30px;
+            background: #25d366;
+        }
+
+        .instagram-float:hover, .whatsapp-float:hover {
+            transform: scale(1.08);
+        }
+
+        .instagram-float i, .whatsapp-float i {
+            font-size: 1.8rem;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -476,12 +511,37 @@
         </div>
     </section>
 
-    <footer class="footer">
-        <div class="container">
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Vinícius Tavares</h4>
+                <p>Criação de Sites Futuristas</p>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/vini.wdev/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/5583988655944" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:vini-dev@zohomail.com"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Contato Direto</h4>
+                <p><i class="fab fa-whatsapp"></i> (83) 98865-5944</p>
+                <p><i class="fas fa-envelope"></i> vini-dev@zohomail.com</p>
+                <p><i class="fab fa-instagram"></i> @vini.wdev</p>
+            </div>
+            <div class="footer-section">
+                <h4>Links Rápidos</h4>
+                <p><a href="#projetos" style="color: white; text-decoration: none;">Projetos</a></p>
+                <p><a href="#planos" style="color: white; text-decoration: none;">Planos</a></p>
+                <p><a href="#contato" style="color: white; text-decoration: none;">Contato</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
             <p>© 2026 Vinícius Tavares - Criando o futuro, um site por vez.</p>
             <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.6;">⚡ Tecnologia de ponta | Design futurista | Resultados reais</p>
         </div>
-    </footer>
+    </div>
+</footer>
 
     <!-- Modal Geral -->
     <div id="modal" class="modal">
@@ -503,6 +563,12 @@
         </div>
     </div>
 
+    <!-- Botão do Instagram -->
+    <div class="instagram-float" onclick="window.open('https://www.instagram.com/vini.wdev/', '_blank')">
+        <i class="fab fa-instagram"></i>
+    </div>
+
+    <!-- Botão do WhatsApp -->
     <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20fiquei%20interessado%20nos%20seus%20servi%C3%A7os.%20Pode%20me%20dar%20mais%20informa%C3%A7%C3%B5es%3F', '_blank')">
         <i class="fab fa-whatsapp"></i>
     </div>
