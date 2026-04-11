@@ -39,7 +39,6 @@ db.exec(`CREATE TABLE IF NOT EXISTS admin (
     password TEXT NOT NULL
 )`);
 
-// Tabela de promoções
 db.exec(`CREATE TABLE IF NOT EXISTS promocoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titulo TEXT NOT NULL,
@@ -53,6 +52,19 @@ db.exec(`CREATE TABLE IF NOT EXISTS promocoes (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
+// NOVA TABELA: Projetos do portfólio
+db.exec(`CREATE TABLE IF NOT EXISTS projetos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    descricao TEXT NOT NULL,
+    link TEXT,
+    imagem TEXT,
+    categoria TEXT DEFAULT 'restaurante',
+    destaque INTEGER DEFAULT 0,
+    ordem INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Inserir admin padrão
 const admin = db.prepare("SELECT COUNT(*) as count FROM admin WHERE username = 'admin'").get();
 if (admin.count === 0) {
@@ -61,11 +73,28 @@ if (admin.count === 0) {
     console.log('✅ Admin criado: admin / Vini@Futuro2026#Secure');
 }
 
-// Inserir promoção de exemplo
-const promocao = db.prepare("SELECT COUNT(*) as count FROM promocoes").get();
-if (promocao.count === 0) {
+// Inserir projetos padrão (se não existirem)
+const projetosCount = db.prepare("SELECT COUNT(*) as count FROM projetos").get();
+if (projetosCount.count === 0) {
+    const projetos = [
+        { nome: "O Barretão", descricao: "Churrascaria com sistema de delivery e fidelidade", link: "https://barretao-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300", destaque: 1, ordem: 1 },
+        { nome: "Ancoreta", descricao: "Restaurante com frutos do mar e vista privilegiada", link: "https://ancora-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300", destaque: 1, ordem: 2 },
+        { nome: "Tiowei", descricao: "Comida japonesa com sistema de reservas", link: "https://tiowei-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1617196035154-1e7e6e28b0db?w=300", destaque: 0, ordem: 3 },
+        { nome: "Leone", descricao: "Culinária italiana com cardápio digital", link: "https://leone-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300", destaque: 0, ordem: 4 },
+        { nome: "D'Melo Bolos", descricao: "Confeitaria artesanal com pedidos online", link: "https://dmelo-bolos.onrender.com", imagem: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=300", destaque: 0, ordem: 5 }
+    ];
+    const stmt = db.prepare(`INSERT INTO projetos (nome, descricao, link, imagem, destaque, ordem) VALUES (?, ?, ?, ?, ?, ?)`);
+    for (const p of projetos) {
+        stmt.run(p.nome, p.descricao, p.link, p.imagem, p.destaque, p.ordem);
+    }
+    console.log('✅ Projetos padrão inseridos!');
+}
+
+// Inserir promoção exemplo
+const promocaoCount = db.prepare("SELECT COUNT(*) as count FROM promocoes").get();
+if (promocaoCount.count === 0) {
     const validade = new Date();
-    validade.setDate(validade.getDate() + 2); // 2 dias de validade
+    validade.setDate(validade.getDate() + 2);
     db.prepare(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, ativo) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
         '🔥 PROMOÇÃO RELÂMPAGO 🔥',
@@ -103,13 +132,7 @@ app.post('/api/contato', (req, res) => {
 });
 
 app.get('/api/projetos', (req, res) => {
-    const projetos = [
-        { id: 1, nome: "O Barretão", descricao: "Churrascaria com sistema de delivery e fidelidade", link: "https://barretao-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300" },
-        { id: 2, nome: "Ancoreta", descricao: "Restaurante com frutos do mar e vista privilegiada", link: "https://ancora-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300" },
-        { id: 3, nome: "Tiowei", descricao: "Comida japonesa com sistema de reservas", link: "https://tiowei-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1617196035154-1e7e6e28b0db?w=300" },
-        { id: 4, nome: "Leone", descricao: "Culinária italiana com cardápio digital", link: "https://leone-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300" },
-        { id: 5, nome: "D'Melo Bolos", descricao: "Confeitaria artesanal com pedidos online", link: "https://dmelo-bolos.onrender.com", imagem: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=300" }
-    ];
+    const projetos = db.prepare("SELECT * FROM projetos ORDER BY destaque DESC, ordem ASC, id DESC").all();
     res.json(projetos);
 });
 
@@ -134,7 +157,49 @@ app.post('/api/admin/login', (req, res) => {
     res.json({ token });
 });
 
-// CRUD de Promoções
+// ===== CRUD PROJETOS =====
+app.get('/api/admin/projetos', verifyToken, (req, res) => {
+    const projetos = db.prepare("SELECT * FROM projetos ORDER BY ordem ASC, id DESC").all();
+    res.json(projetos);
+});
+
+app.post('/api/admin/projetos', verifyToken, (req, res) => {
+    const { nome, descricao, link, imagem, categoria, destaque } = req.body;
+    if (!nome || !descricao) {
+        return res.status(400).json({ error: 'Nome e descrição são obrigatórios' });
+    }
+    try {
+        const stmt = db.prepare(`INSERT INTO projetos (nome, descricao, link, imagem, categoria, destaque) 
+            VALUES (?, ?, ?, ?, ?, ?)`);
+        const result = stmt.run(nome, descricao, link || null, imagem || null, categoria || 'restaurante', destaque || 0);
+        res.json({ id: result.lastInsertRowid, message: 'Projeto adicionado!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/admin/projetos/:id', verifyToken, (req, res) => {
+    const { nome, descricao, link, imagem, categoria, destaque } = req.body;
+    try {
+        db.prepare(`UPDATE projetos SET 
+            nome = ?, descricao = ?, link = ?, imagem = ?, categoria = ?, destaque = ?
+            WHERE id = ?`).run(nome, descricao, link, imagem, categoria, destaque || 0, req.params.id);
+        res.json({ message: 'Projeto atualizado!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/admin/projetos/:id', verifyToken, (req, res) => {
+    try {
+        db.prepare("DELETE FROM projetos WHERE id = ?").run(req.params.id);
+        res.json({ message: 'Projeto excluído!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ===== CRUD PROMOÇÕES =====
 app.get('/api/admin/promocoes', verifyToken, (req, res) => {
     const promocoes = db.prepare("SELECT * FROM promocoes ORDER BY created_at DESC").all();
     res.json(promocoes);
@@ -147,7 +212,7 @@ app.post('/api/admin/promocoes', verifyToken, (req, res) => {
             (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque, ativo) 
             VALUES (?, ?, ?, ?, ?, ?, ?, 1)`);
         const result = stmt.run(titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque || '#ff3366');
-        res.json({ id: result.lastInsertRowid, message: 'Promoção criada com sucesso!' });
+        res.json({ id: result.lastInsertRowid, message: 'Promoção criada!' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -156,7 +221,7 @@ app.post('/api/admin/promocoes', verifyToken, (req, res) => {
 app.put('/api/admin/promocoes/:id', verifyToken, (req, res) => {
     const { ativo } = req.body;
     db.prepare("UPDATE promocoes SET ativo = ? WHERE id = ?").run(ativo, req.params.id);
-    res.json({ message: 'Status da promoção atualizado!' });
+    res.json({ message: 'Status atualizado!' });
 });
 
 app.delete('/api/admin/promocoes/:id', verifyToken, (req, res) => {
@@ -172,24 +237,25 @@ app.get('/api/admin/leads', verifyToken, (req, res) => {
 app.delete('/api/admin/leads/:id', verifyToken, (req, res) => {
     const result = db.prepare("DELETE FROM leads WHERE id = ?").run(req.params.id);
     if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
-    res.json({ message: 'Lead excluído com sucesso' });
+    res.json({ message: 'Lead excluído!' });
 });
 
 app.put('/api/admin/leads/:id/finalizar', verifyToken, (req, res) => {
     const result = db.prepare("UPDATE leads SET status = 'finalizado' WHERE id = ?").run(req.params.id);
     if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
-    res.json({ message: 'Lead finalizado com sucesso' });
+    res.json({ message: 'Lead finalizado!' });
 });
 
 app.get('/api/admin/stats', verifyToken, (req, res) => {
     const totalLeads = db.prepare("SELECT COUNT(*) as total FROM leads").get();
     const pendentes = db.prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'pendente'").get();
     const finalizados = db.prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'finalizado'").get();
+    const totalProjetos = db.prepare("SELECT COUNT(*) as total FROM projetos").get();
     res.json({
         totalLeads: totalLeads.total,
         pendentes: pendentes.total,
         finalizados: finalizados.total,
-        projetosTotal: 5
+        projetosTotal: totalProjetos.total
     });
 });
 

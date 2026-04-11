@@ -91,6 +91,7 @@
   <div style="padding: 0 20px;">
     <button class="tab active" onclick="showTab('leads')">📩 Leads / Pedidos</button>
     <button class="tab" onclick="showTab('promocoes')">🎯 Promoções</button>
+    <button class="tab" onclick="showTab('projetos')">📁 Projetos</button>
   </div>
   
   <div id="leads" class="tab-content active">
@@ -128,6 +129,18 @@
     <button class="btn-success" onclick="salvarPromocao()" style="width:100%; margin-top:10px;">Salvar Promoção</button>
     <button onclick="fecharModalPromocao()" style="width:100%; margin-top:10px; padding:10px; background:#374151; border:none; border-radius:8px; color:white; cursor:pointer;">Cancelar</button>
   </div>
+</div>
+
+<div id="projetos" class="tab-content">
+    <button class="btn-primary" onclick="abrirModalProjeto()" style="margin-bottom: 20px;">+ Adicionar Novo Projeto</button>
+    <div style="overflow-x:auto;">
+        <table id="projetos-table">
+            <thead>
+                <tr><th>ID</th><th>Nome</th><th>Descrição</th><th>Link</th><th>Destaque</th><th>Ações</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -170,6 +183,7 @@
     
     await carregarLeads();
     await carregarPromocoes();
+    await carregarProjetos();
   }
   
   async function carregarLeads() {
@@ -282,6 +296,90 @@
     carregarPromocoes();
   }
   
+  async function carregarProjetos() {
+    const res = await fetch('/api/admin/projetos', { headers: { 'Authorization': `Bearer ${token}` } });
+    const projetos = await res.json();
+    document.querySelector('#projetos-table tbody').innerHTML = projetos.map(p => `
+        <tr>
+            <td>${p.id}</td>
+            <td><strong>${p.nome}</strong></td>
+            <td style="max-width:250px; white-space:normal;">${p.descricao}</td>
+            <td><a href="${p.link}" target="_blank" style="color:#00ffff;">🔗 Ver</a></td>
+            <td>${p.destaque === 1 ? '⭐ Sim' : '❌ Não'}</td>
+            <td>
+                <button class="btn-finalizar" onclick="editarProjeto(${p.id})">✏️ Editar</button>
+                <button class="btn-delete" onclick="deletarProjeto(${p.id})">🗑️ Excluir</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function abrirModalProjeto() {
+    document.getElementById('modalProjeto').style.display = 'flex';
+    document.getElementById('projeto-id').value = '';
+    document.getElementById('projeto-nome').value = '';
+    document.getElementById('projeto-descricao').value = '';
+    document.getElementById('projeto-link').value = 'https://';
+    document.getElementById('projeto-imagem').value = '';
+    document.getElementById('projeto-categoria').value = 'restaurante';
+    document.getElementById('projeto-destaque').checked = false;
+}
+
+function fecharModalProjeto() {
+    document.getElementById('modalProjeto').style.display = 'none';
+}
+
+async function editarProjeto(id) {
+    const res = await fetch('/api/admin/projetos', { headers: { 'Authorization': `Bearer ${token}` } });
+    const projetos = await res.json();
+    const projeto = projetos.find(p => p.id === id);
+    if (projeto) {
+        document.getElementById('projeto-id').value = projeto.id;
+        document.getElementById('projeto-nome').value = projeto.nome;
+        document.getElementById('projeto-descricao').value = projeto.descricao;
+        document.getElementById('projeto-link').value = projeto.link || 'https://';
+        document.getElementById('projeto-imagem').value = projeto.imagem || '';
+        document.getElementById('projeto-categoria').value = projeto.categoria || 'restaurante';
+        document.getElementById('projeto-destaque').checked = projeto.destaque === 1;
+        document.getElementById('modalProjeto').style.display = 'flex';
+    }
+}
+
+async function salvarProjeto() {
+    const id = document.getElementById('projeto-id').value;
+    const projeto = {
+        nome: document.getElementById('projeto-nome').value,
+        descricao: document.getElementById('projeto-descricao').value,
+        link: document.getElementById('projeto-link').value,
+        imagem: document.getElementById('projeto-imagem').value,
+        categoria: document.getElementById('projeto-categoria').value,
+        destaque: document.getElementById('projeto-destaque').checked ? 1 : 0
+    };
+    
+    const url = id ? `/api/admin/projetos/${id}` : '/api/admin/projetos';
+    const method = id ? 'PUT' : 'POST';
+    
+    await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(projeto)
+    });
+    
+    fecharModalProjeto();
+    carregarProjetos();
+    loadDashboard();
+}
+
+async function deletarProjeto(id) {
+    if (!confirm('⚠️ Excluir este projeto permanentemente?')) return;
+    await fetch(`/api/admin/projetos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    carregarProjetos();
+    loadDashboard();
+}
+
   function showTab(tab) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
     document.getElementById(tab).classList.add('active'); 
@@ -292,5 +390,29 @@
   const saved = localStorage.getItem('portfolio_token'); 
   if (saved) { token = saved; document.getElementById('login').style.display = 'none'; document.getElementById('dashboard').style.display = 'block'; loadDashboard(); }
 </script>
+
+<!-- Modal Projeto -->
+<div id="modalProjeto" class="modal">
+  <div class="modal-content">
+    <h3>📁 Adicionar/Editar Projeto</h3>
+    <input type="hidden" id="projeto-id">
+    <input type="text" id="projeto-nome" placeholder="Nome do projeto (ex: O Barretão)">
+    <textarea id="projeto-descricao" placeholder="Descrição do projeto..." rows="3"></textarea>
+    <input type="text" id="projeto-link" placeholder="Link do site (ex: https://...)" value="https://">
+    <input type="text" id="projeto-imagem" placeholder="URL da imagem (deixe em branco para usar padrão)">
+    <select id="projeto-categoria">
+        <option value="restaurante">Restaurante</option>
+        <option value="confeitaria">Confeitaria</option>
+        <option value="ecommerce">E-commerce</option>
+        <option value="outro">Outro</option>
+    </select>
+    <label style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+        <input type="checkbox" id="projeto-destaque"> Destacar no portfólio
+    </label>
+    <button class="btn-success" onclick="salvarProjeto()" style="width:100%; margin-top:10px;">Salvar Projeto</button>
+    <button onclick="fecharModalProjeto()" style="width:100%; margin-top:10px; padding:10px; background:#374151; border:none; border-radius:8px; color:white; cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
 </body>
 </html>
