@@ -25,7 +25,6 @@
         .nav-links { display: flex; gap: 25px; list-style: none; align-items: center; }
         .nav-links a { color: #fff; text-decoration: none; transition: 0.3s; font-weight: 500; }
         .nav-links a:hover { color: #00ffff; }
-        /* Botão de tradução */
         .lang-btn { background: #1f2937; border: 1px solid #00ffff33; color: #00ffff; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; margin-left: 10px; }
         .lang-btn:hover { background: #00ffff33; border-color: #00ffff; }
         .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 80px; }
@@ -75,6 +74,7 @@
         .social-links a { color: white; font-size: 1.5rem; transition: 0.3s; }
         .social-links a:hover { color: #00ffff; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #00ffff22; }
+        .price-usd, .price-brl { transition: 0.2s; }
         @media (max-width: 768px) { .name-front, .name-back { font-size: 2.5rem; } .hero-content p { font-size: 0.9rem; } .container { padding: 0 20px; } .nav-links { display: none; } .section-title { font-size: 1.8rem; } .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; } .promo-banner { margin-top: 70px; margin-left: 10px; margin-right: 10px; } .promo-titulo { font-size: 1.2rem; } .preco-novo { font-size: 1.3rem; } .promo-precos { font-size: 1rem; } }
     </style>
 </head>
@@ -119,7 +119,43 @@
 
     <section id="projetos" class="section"><div class="container"><h2 class="section-title" data-i18n="projects-title">⚡ Projetos Revolucionários</h2><div class="projects-grid" id="projects-grid">Carregando...</div></div></section>
     
-    <section id="planos" class="section"><div class="container"><h2 class="section-title" data-i18n="plans-title">💰 Planos Futuristas</h2><div class="projects-grid"><div class="project-card"><div class="project-info"><h3 data-i18n="plan-basic-title">🚀 Básico</h3><p data-i18n="plan-basic-desc">Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 800</p></div></div><div class="project-card"><div class="project-info"><h3 data-i18n="plan-complete-title">⚡ Completo</h3><p data-i18n="plan-complete-desc">Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.200</p></div></div><div class="project-card"><div class="project-info"><h3 data-i18n="plan-premium-title">🔥 Premium</h3><p data-i18n="plan-premium-desc">Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses</p><p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">R$ 1.800</p></div></div></div></div></section>
+    <section id="planos" class="section">
+        <div class="container">
+            <h2 class="section-title" data-i18n="plans-title">💰 Planos Futuristas</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-info">
+                        <h3 data-i18n="plan-basic-title">🚀 Básico</h3>
+                        <p data-i18n="plan-basic-desc">Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano</p>
+                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
+                            <span class="price-brl">R$ 800</span>
+                            <span class="price-usd" style="display:none;">$140</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-info">
+                        <h3 data-i18n="plan-complete-title">⚡ Completo</h3>
+                        <p data-i18n="plan-complete-desc">Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin</p>
+                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
+                            <span class="price-brl">R$ 1.200</span>
+                            <span class="price-usd" style="display:none;">$210</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-info">
+                        <h3 data-i18n="plan-premium-title">🔥 Premium</h3>
+                        <p data-i18n="plan-premium-desc">Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses</p>
+                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
+                            <span class="price-brl">R$ 1.800</span>
+                            <span class="price-usd" style="display:none;">$315</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <section id="contato" class="section"><div class="container"><h2 class="section-title" data-i18n="contact-title">📡 Contato</h2><div style="max-width: 550px; margin: 0 auto;"><form id="contact-form"><div class="form-group"><input type="text" id="nome" placeholder="Seu nome" data-i18n-placeholder="contact-name" required></div><div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" data-i18n-placeholder="contact-email" required></div><div class="form-group"><input type="tel" id="telefone" placeholder="WhatsApp (opcional)" data-i18n-placeholder="contact-whatsapp"></div><div class="form-group"><textarea id="mensagem" rows="4" placeholder="Descreva seu projeto..." data-i18n-placeholder="contact-message" required></textarea></div><button type="submit" class="btn-primary" style="width:100%;" data-i18n="contact-submit">Enviar Mensagem</button></form></div></div></section>
 
@@ -132,6 +168,23 @@
     <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20fiquei%20interessado%20nos%20seus%20servi%C3%A7os.%20Pode%20me%20dar%20mais%20informa%C3%A7%C3%B5es%3F', '_blank')"><i class="fab fa-whatsapp"></i></div>
 
     <script>
+        // Taxa de câmbio (1 USD = 5,70 BRL)
+        const EXCHANGE_RATE = 5.70;
+        
+        // Preços em BRL
+        const PRICES_BRL = {
+            basic: 800,
+            complete: 1200,
+            premium: 1800
+        };
+        
+        // Preços em USD (calculados)
+        const PRICES_USD = {
+            basic: Math.round(PRICES_BRL.basic / EXCHANGE_RATE),
+            complete: Math.round(PRICES_BRL.complete / EXCHANGE_RATE),
+            premium: Math.round(PRICES_BRL.premium / EXCHANGE_RATE)
+        };
+        
         // Dicionário de traduções
         const translations = {
             pt: {
@@ -217,6 +270,20 @@
         function toggleLanguage() {
             currentLang = currentLang === 'pt' ? 'en' : 'pt';
             translatePage();
+            updatePrices();
+        }
+        
+        function updatePrices() {
+            const brlPrices = document.querySelectorAll('.price-brl');
+            const usdPrices = document.querySelectorAll('.price-usd');
+            
+            if (currentLang === 'pt') {
+                brlPrices.forEach(el => el.style.display = 'inline');
+                usdPrices.forEach(el => el.style.display = 'none');
+            } else {
+                brlPrices.forEach(el => el.style.display = 'none');
+                usdPrices.forEach(el => el.style.display = 'inline');
+            }
         }
         
         function translatePage() {
@@ -246,6 +313,12 @@
                 langBtn.innerText = currentLang === 'pt' ? '🇧🇷 PT | 🇺🇸 EN' : '🇺🇸 EN | 🇧🇷 PT';
             }
             
+            // Atualiza link do modal se estiver em inglês
+            const modalLink = document.getElementById('project-link');
+            if (modalLink && modalLink.innerHTML !== '⚠️ Link indisponível') {
+                modalLink.innerHTML = currentLang === 'pt' ? 'Visitar Site →' : 'Visit Website →';
+            }
+            
             // Salva preferência no localStorage
             localStorage.setItem('preferred_language', currentLang);
         }
@@ -255,6 +328,7 @@
         if (savedLang && (savedLang === 'pt' || savedLang === 'en')) {
             currentLang = savedLang;
             translatePage();
+            updatePrices();
         }
         
         // Partículas
@@ -290,7 +364,7 @@
                             <div class="project-info">
                                 <h3>${p.nome}</h3>
                                 <p>${p.descricao}</p>
-                                <button class="btn-view">Ver Projeto →</button>
+                                <button class="btn-view">${currentLang === 'pt' ? 'Ver Projeto →' : 'View Project →'}</button>
                             </div>
                         </div>
                     `;
