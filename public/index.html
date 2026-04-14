@@ -138,31 +138,59 @@
             document.getElementById('particles').appendChild(particle);
         }
 
-        async function loadProjects() {
-            try {
-                const res = await fetch('/api/projetos');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const projetos = await res.json();
-                const grid = document.getElementById('projects-grid');
-                if (!projetos.length) { grid.innerHTML = '<p style="text-align:center;">Nenhum projeto encontrado.</p>'; return; }
-                grid.innerHTML = projetos.map(p => `
-                    <div class="project-card" onclick="openProjectModal(${p.id}, \`${p.nome}\`, \`${p.descricao}\`, \`${p.link}\`)">
-                        <img src="${p.imagem || 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'}" alt="${p.nome}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'">
-                        <div class="project-info"><h3>${p.nome}</h3><p>${p.descricao}</p><button class="btn-view">Ver Projeto →</button></div>
+async function loadProjects() {
+    try {
+        const res = await fetch('/api/projetos');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const projetos = await res.json();
+        const grid = document.getElementById('projects-grid');
+        if (!projetos.length) { 
+            grid.innerHTML = '<p style="text-align:center;">Nenhum projeto encontrado.</p>'; 
+            return; 
+        }
+        grid.innerHTML = projetos.map(p => {
+            // ESCAPA os caracteres especiais para não quebrar o HTML
+            const nomeEscapado = p.nome.replace(/'/g, "\\'").replace(/`/g, '\\`');
+            const descEscapada = p.descricao.replace(/'/g, "\\'").replace(/`/g, '\\`');
+            const linkEscapado = (p.link || '').replace(/'/g, "\\'");
+            
+            return `
+                <div class="project-card" onclick="openProjectModal('${p.id}', '${nomeEscapado}', '${descEscapada}', '${linkEscapado}')">
+                    <img src="${p.imagem || 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'}" alt="${p.nome}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'">
+                    <div class="project-info">
+                        <h3>${p.nome}</h3>
+                        <p>${p.descricao}</p>
+                        <button class="btn-view">Ver Projeto →</button>
                     </div>
-                `).join('');
-            } catch(err) { console.error('Erro ao carregar projetos:', err); document.getElementById('projects-grid').innerHTML = '<p style="text-align:center;color:red;">Erro ao carregar projetos. Tente novamente mais tarde.</p>'; }
-        }
+                </div>
+            `;
+        }).join('');
+    } catch(err) { 
+        console.error('Erro ao carregar projetos:', err); 
+        document.getElementById('projects-grid').innerHTML = '<p style="text-align:center;color:red;">Erro ao carregar projetos. Tente novamente mais tarde.</p>'; 
+    }
+}
 
-        function openProjectModal(id, nome, desc, link) {
-            document.getElementById('project-name').innerText = nome;
-            document.getElementById('project-desc').innerText = desc;
-            let linkCorrigido = (link && link !== 'https://') ? (link.startsWith('http') ? link : 'https://' + link) : '#';
-            const linkEl = document.getElementById('project-link');
-            if (linkCorrigido === '#') { linkEl.innerHTML = '⚠️ Link indisponível'; linkEl.href = '#'; linkEl.style.opacity = '0.5'; linkEl.style.cursor = 'not-allowed'; }
-            else { linkEl.innerHTML = 'Visitar Site →'; linkEl.href = linkCorrigido; linkEl.style.opacity = '1'; linkEl.style.cursor = 'pointer'; }
-            document.getElementById('projectModal').style.display = 'flex';
-        }
+function openProjectModal(id, nome, desc, link) {
+    document.getElementById('project-name').innerText = nome;
+    document.getElementById('project-desc').innerText = desc;
+    
+    let linkCorrigido = (link && link !== 'https://') ? (link.startsWith('http') ? link : 'https://' + link) : '#';
+    const linkEl = document.getElementById('project-link');
+    
+    if (linkCorrigido === '#') { 
+        linkEl.innerHTML = '⚠️ Link indisponível'; 
+        linkEl.href = '#'; 
+        linkEl.style.opacity = '0.5'; 
+        linkEl.style.cursor = 'not-allowed'; 
+    } else { 
+        linkEl.innerHTML = 'Visitar Site →'; 
+        linkEl.href = linkCorrigido; 
+        linkEl.style.opacity = '1'; 
+        linkEl.style.cursor = 'pointer'; 
+    }
+    document.getElementById('projectModal').style.display = 'flex';
+}
         function closeProjectModal() { document.getElementById('projectModal').style.display = 'none'; }
         document.getElementById('contact-form').addEventListener('submit', async (e) => {
             e.preventDefault();

@@ -3,264 +3,245 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const fs = require('fs');
-const Database = require('better-sqlite3');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = 'portfolio_vini_super_secret_2026';
+const SECRET_KEY = process.env.SECRET_KEY || 'portfolio_vini_super_secret_2026';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Banco de dados
-const dbDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
-const dbPath = path.join(dbDir, 'portfolio.db');
-console.log('📁 Banco de dados:', dbPath);
-
-const db = new Database(dbPath);
+// Conexão com PostgreSQL (Render fornece a variável DATABASE_URL)
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 // Criar tabelas
-db.exec(`CREATE TABLE IF NOT EXISTS leads (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    email TEXT NOT NULL,
-    telefone TEXT,
-    mensagem TEXT NOT NULL,
-    status TEXT DEFAULT 'pendente',
-    data DATETIME DEFAULT CURRENT_TIMESTAMP
-)`);
+async function initDatabase() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS leads (
+        id SERIAL PRIMARY KEY,
+        nome TEXT NOT NULL,
+        email TEXT NOT NULL,
+        telefone TEXT,
+        mensagem TEXT NOT NULL,
+        status TEXT DEFAULT 'pendente',
+        data TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS promocoes (
+        id SERIAL PRIMARY KEY,
+        titulo TEXT NOT NULL,
+        descricao TEXT,
+        preco_original TEXT,
+        preco_promocional TEXT,
+        bonus TEXT,
+        data_validade TIMESTAMP,
+        ativo INTEGER DEFAULT 1,
+        cor_destaque TEXT DEFAULT '#ff3366',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS projetos (
+        id SERIAL PRIMARY KEY,
+        nome TEXT NOT NULL,
+        descricao TEXT NOT NULL,
+        link TEXT,
+        imagem TEXT,
+        categoria TEXT DEFAULT 'restaurante',
+        destaque INTEGER DEFAULT 0,
+        ordem INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-db.exec(`CREATE TABLE IF NOT EXISTS admin (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-)`);
-
-db.exec(`CREATE TABLE IF NOT EXISTS promocoes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titulo TEXT NOT NULL,
-    descricao TEXT,
-    preco_original TEXT,
-    preco_promocional TEXT,
-    bonus TEXT,
-    data_validade DATETIME,
-    ativo INTEGER DEFAULT 1,
-    cor_destaque TEXT DEFAULT '#ff3366',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-)`);
-
-// NOVA TABELA: Projetos do portfólio
-db.exec(`CREATE TABLE IF NOT EXISTS projetos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    descricao TEXT NOT NULL,
-    link TEXT,
-    imagem TEXT,
-    categoria TEXT DEFAULT 'restaurante',
-    destaque INTEGER DEFAULT 0,
-    ordem INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-)`);
-
-// Inserir admin padrão
-const admin = db.prepare("SELECT COUNT(*) as count FROM admin WHERE username = 'admin'").get();
-if (admin.count === 0) {
-    const hashedPassword = bcrypt.hashSync('Vini@Futuro2026#Secure', 10);
-    db.prepare("INSERT INTO admin (username, password) VALUES (?, ?)").run('admin', hashedPassword);
-    console.log('✅ Admin criado: admin / Vini@Futuro2026#Secure');
-}
-
-// Inserir projetos padrão (se não existirem)
-const projetosCount = db.prepare("SELECT COUNT(*) as count FROM projetos").get();
-if (projetosCount.count === 0) {
-    const projetos = [
-        { nome: "O Barretão", descricao: "Churrascaria com sistema de delivery e fidelidade", link: "https://barretao-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300", destaque: 1, ordem: 1 },
-        { nome: "Ancoreta", descricao: "Restaurante com frutos do mar e vista privilegiada", link: "https://ancora-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300", destaque: 1, ordem: 2 },
-        { nome: "Tiowei", descricao: "Comida japonesa com sistema de reservas", link: "https://tiowei-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1617196035154-1e7e6e28b0db?w=300", destaque: 0, ordem: 3 },
-        { nome: "Leone", descricao: "Culinária italiana com cardápio digital", link: "https://leone-restaurante.onrender.com", imagem: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300", destaque: 0, ordem: 4 },
-        { nome: "D'Melo Bolos", descricao: "Confeitaria artesanal com pedidos online", link: "https://dmelo-bolos.onrender.com", imagem: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=300", destaque: 0, ordem: 5 }
-    ];
-    const stmt = db.prepare(`INSERT INTO projetos (nome, descricao, link, imagem, destaque, ordem) VALUES (?, ?, ?, ?, ?, ?)`);
-    for (const p of projetos) {
-        stmt.run(p.nome, p.descricao, p.link, p.imagem, p.destaque, p.ordem);
+    // Inserir admin padrão
+    const admin = await pool.query("SELECT * FROM admin WHERE username = 'admin'");
+    if (admin.rows.length === 0) {
+      const hashedPassword = bcrypt.hashSync('Vini@Futuro2026#Secure', 10);
+      await pool.query("INSERT INTO admin (username, password) VALUES ($1, $2)", ['admin', hashedPassword]);
+      console.log('✅ Admin criado');
     }
-    console.log('✅ Projetos padrão inseridos!');
+
+    // Inserir projetos padrão
+    const projetos = await pool.query("SELECT * FROM projetos");
+    if (projetos.rows.length === 0) {
+      const projetosList = [
+        ['O Barretão', 'Churrascaria com sistema de delivery e fidelidade', 'https://barretao-restaurante.onrender.com', 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300', 1, 1],
+        ['Ancoreta', 'Restaurante com frutos do mar e vista privilegiada', 'https://ancora-restaurante.onrender.com', 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300', 1, 2],
+        ['Tiowei', 'Comida japonesa com sistema de reservas', 'https://tiowei-restaurante.onrender.com', 'https://images.unsplash.com/photo-1617196035154-1e7e6e28b0db?w=300', 0, 3],
+        ['Leone', 'Culinária italiana com cardápio digital', 'https://leone-restaurante.onrender.com', 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300', 0, 4],
+        ['D\'Melo Bolos', 'Confeitaria artesanal com pedidos online', 'https://dmelo-bolos.onrender.com', 'https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=300', 0, 5]
+      ];
+      for (const p of projetosList) {
+        await pool.query(`INSERT INTO projetos (nome, descricao, link, imagem, destaque, ordem) VALUES ($1, $2, $3, $4, $5, $6)`, p);
+      }
+      console.log('✅ Projetos padrão inseridos');
+    }
+
+    // Inserir promoção exemplo
+    const promocoes = await pool.query("SELECT * FROM promocoes");
+    if (promocoes.rows.length === 0) {
+      const validade = new Date();
+      validade.setDate(validade.getDate() + 2);
+      await pool.query(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, ativo) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        ['🔥 PROMOÇÃO RELÂMPAGO 🔥', 'Aproveite o desconto especial para os primeiros clientes!', 'R$ 800', 'R$ 450', '+ 1 mês de suporte gratuito', validade, 1]);
+      console.log('✅ Promoção exemplo criada');
+    }
+
+    console.log('📁 Banco PostgreSQL conectado com sucesso!');
+  } catch (err) {
+    console.error('Erro ao inicializar banco:', err);
+  }
 }
 
-// Inserir promoção exemplo
-const promocaoCount = db.prepare("SELECT COUNT(*) as count FROM promocoes").get();
-if (promocaoCount.count === 0) {
-    const validade = new Date();
-    validade.setDate(validade.getDate() + 2);
-    db.prepare(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, ativo) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
-        '🔥 PROMOÇÃO RELÂMPAGO 🔥',
-        'Aproveite o desconto especial para os primeiros clientes!',
-        'R$ 800',
-        'R$ 450',
-        '+ 1 mês de suporte gratuito',
-        validade.toISOString(),
-        1
-    );
-    console.log('✅ Promoção exemplo criada!');
-}
+initDatabase();
 
 // ========== ROTAS PÚBLICAS ==========
-app.get('/api/promocao/ativa', (req, res) => {
-    const agora = new Date().toISOString();
-    const promocao = db.prepare(`SELECT * FROM promocoes 
-        WHERE ativo = 1 AND data_validade > ? 
-        ORDER BY created_at DESC LIMIT 1`).get(agora);
-    res.json(promocao || null);
+app.get('/api/promocao/ativa', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM promocoes WHERE ativo = 1 AND data_validade > NOW() ORDER BY created_at DESC LIMIT 1`);
+    res.json(result.rows[0] || null);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/contato', (req, res) => {
-    const { nome, email, telefone, mensagem } = req.body;
-    if (!nome || !email || !mensagem) {
-        return res.status(400).json({ error: 'Campos obrigatórios' });
-    }
-    try {
-        const stmt = db.prepare("INSERT INTO leads (nome, email, telefone, mensagem, status) VALUES (?, ?, ?, ?, 'pendente')");
-        const result = stmt.run(nome, email, telefone || null, mensagem);
-        res.json({ id: result.lastInsertRowid, message: 'Mensagem enviada com sucesso!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.post('/api/contato', async (req, res) => {
+  const { nome, email, telefone, mensagem } = req.body;
+  if (!nome || !email || !mensagem) return res.status(400).json({ error: 'Campos obrigatórios' });
+  try {
+    const result = await pool.query(`INSERT INTO leads (nome, email, telefone, mensagem, status) VALUES ($1, $2, $3, $4, 'pendente') RETURNING id`, [nome, email, telefone || null, mensagem]);
+    res.json({ id: result.rows[0].id, message: 'Mensagem enviada!' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/projetos', (req, res) => {
-    const projetos = db.prepare("SELECT * FROM projetos ORDER BY destaque DESC, ordem ASC, id DESC").all();
-    res.json(projetos);
+app.get('/api/projetos', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM projetos ORDER BY destaque DESC, ordem ASC, id DESC`);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ========== ROTAS ADMIN ==========
 function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).json({ error: 'Token não fornecido' });
-    jwt.verify(token.split(' ')[1], SECRET_KEY, (err, decoded) => {
-        if (err) return res.status(403).json({ error: 'Token inválido' });
-        req.user = decoded;
-        next();
-    });
+  const token = req.headers['authorization'];
+  if (!token) return res.status(403).json({ error: 'Token não fornecido' });
+  jwt.verify(token.split(' ')[1], SECRET_KEY, (err, decoded) => {
+    if (err) return res.status(403).json({ error: 'Token inválido' });
+    req.user = decoded;
+    next();
+  });
 }
 
-app.post('/api/admin/login', (req, res) => {
-    const { username, password } = req.body;
-    const user = db.prepare("SELECT * FROM admin WHERE username = ?").get(username);
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ error: 'Usuário ou senha inválidos' });
+app.post('/api/admin/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await pool.query("SELECT * FROM admin WHERE username = $1", [username]);
+    if (user.rows.length === 0 || !bcrypt.compareSync(password, user.rows[0].password)) {
+      return res.status(401).json({ error: 'Usuário ou senha inválidos' });
     }
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '24h' });
+    const token = jwt.sign({ id: user.rows[0].id, username: user.rows[0].username }, SECRET_KEY, { expiresIn: '24h' });
     res.json({ token });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ===== CRUD PROJETOS =====
-app.get('/api/admin/projetos', verifyToken, (req, res) => {
-    const projetos = db.prepare("SELECT * FROM projetos ORDER BY ordem ASC, id DESC").all();
-    res.json(projetos);
+// CRUD Projetos
+app.get('/api/admin/projetos', verifyToken, async (req, res) => {
+  try { const result = await pool.query("SELECT * FROM projetos ORDER BY ordem ASC, id DESC"); res.json(result.rows); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/admin/projetos', verifyToken, (req, res) => {
-    const { nome, descricao, link, imagem, categoria, destaque } = req.body;
-    if (!nome || !descricao) {
-        return res.status(400).json({ error: 'Nome e descrição são obrigatórios' });
-    }
-    try {
-        const stmt = db.prepare(`INSERT INTO projetos (nome, descricao, link, imagem, categoria, destaque) 
-            VALUES (?, ?, ?, ?, ?, ?)`);
-        const result = stmt.run(nome, descricao, link || null, imagem || null, categoria || 'restaurante', destaque || 0);
-        res.json({ id: result.lastInsertRowid, message: 'Projeto adicionado!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.post('/api/admin/projetos', verifyToken, async (req, res) => {
+  const { nome, descricao, link, imagem, categoria, destaque } = req.body;
+  if (!nome || !descricao) return res.status(400).json({ error: 'Nome e descrição são obrigatórios' });
+  try {
+    const result = await pool.query(`INSERT INTO projetos (nome, descricao, link, imagem, categoria, destaque) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, [nome, descricao, link || null, imagem || null, categoria || 'restaurante', destaque || 0]);
+    res.json({ id: result.rows[0].id, message: 'Projeto adicionado!' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/admin/projetos/:id', verifyToken, (req, res) => {
-    const { nome, descricao, link, imagem, categoria, destaque } = req.body;
-    try {
-        db.prepare(`UPDATE projetos SET 
-            nome = ?, descricao = ?, link = ?, imagem = ?, categoria = ?, destaque = ?
-            WHERE id = ?`).run(nome, descricao, link, imagem, categoria, destaque || 0, req.params.id);
-        res.json({ message: 'Projeto atualizado!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.put('/api/admin/projetos/:id', verifyToken, async (req, res) => {
+  const { nome, descricao, link, imagem, categoria, destaque } = req.body;
+  try {
+    await pool.query(`UPDATE projetos SET nome=$1, descricao=$2, link=$3, imagem=$4, categoria=$5, destaque=$6 WHERE id=$7`, [nome, descricao, link, imagem, categoria, destaque || 0, req.params.id]);
+    res.json({ message: 'Projeto atualizado!' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/admin/projetos/:id', verifyToken, (req, res) => {
-    try {
-        db.prepare("DELETE FROM projetos WHERE id = ?").run(req.params.id);
-        res.json({ message: 'Projeto excluído!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.delete('/api/admin/projetos/:id', verifyToken, async (req, res) => {
+  try { await pool.query("DELETE FROM projetos WHERE id = $1", [req.params.id]); res.json({ message: 'Projeto excluído!' }); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ===== CRUD PROMOÇÕES =====
-app.get('/api/admin/promocoes', verifyToken, (req, res) => {
-    const promocoes = db.prepare("SELECT * FROM promocoes ORDER BY created_at DESC").all();
-    res.json(promocoes);
+// CRUD Promoções
+app.get('/api/admin/promocoes', verifyToken, async (req, res) => {
+  try { const result = await pool.query("SELECT * FROM promocoes ORDER BY created_at DESC"); res.json(result.rows); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/admin/promocoes', verifyToken, (req, res) => {
-    const { titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque } = req.body;
-    try {
-        const stmt = db.prepare(`INSERT INTO promocoes 
-            (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque, ativo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 1)`);
-        const result = stmt.run(titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque || '#ff3366');
-        res.json({ id: result.lastInsertRowid, message: 'Promoção criada!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.post('/api/admin/promocoes', verifyToken, async (req, res) => {
+  const { titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque } = req.body;
+  try {
+    const result = await pool.query(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque, ativo) VALUES ($1, $2, $3, $4, $5, $6, $7, 1) RETURNING id`, [titulo, descricao, preco_original, preco_promocional, bonus, data_validade, cor_destaque || '#ff3366']);
+    res.json({ id: result.rows[0].id, message: 'Promoção criada!' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/admin/promocoes/:id', verifyToken, (req, res) => {
-    const { ativo } = req.body;
-    db.prepare("UPDATE promocoes SET ativo = ? WHERE id = ?").run(ativo, req.params.id);
-    res.json({ message: 'Status atualizado!' });
+app.put('/api/admin/promocoes/:id', verifyToken, async (req, res) => {
+  const { ativo } = req.body;
+  try { await pool.query("UPDATE promocoes SET ativo = $1 WHERE id = $2", [ativo, req.params.id]); res.json({ message: 'Status atualizado!' }); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/admin/promocoes/:id', verifyToken, (req, res) => {
-    db.prepare("DELETE FROM promocoes WHERE id = ?").run(req.params.id);
-    res.json({ message: 'Promoção excluída!' });
+app.delete('/api/admin/promocoes/:id', verifyToken, async (req, res) => {
+  try { await pool.query("DELETE FROM promocoes WHERE id = $1", [req.params.id]); res.json({ message: 'Promoção excluída!' }); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/leads', verifyToken, (req, res) => {
-    const leads = db.prepare("SELECT * FROM leads ORDER BY data DESC").all();
-    res.json(leads);
+app.get('/api/admin/leads', verifyToken, async (req, res) => {
+  try { const result = await pool.query("SELECT * FROM leads ORDER BY data DESC"); res.json(result.rows); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/admin/leads/:id', verifyToken, (req, res) => {
-    const result = db.prepare("DELETE FROM leads WHERE id = ?").run(req.params.id);
-    if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
-    res.json({ message: 'Lead excluído!' });
+app.delete('/api/admin/leads/:id', verifyToken, async (req, res) => {
+  try { await pool.query("DELETE FROM leads WHERE id = $1", [req.params.id]); res.json({ message: 'Lead excluído!' }); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/admin/leads/:id/finalizar', verifyToken, (req, res) => {
-    const result = db.prepare("UPDATE leads SET status = 'finalizado' WHERE id = ?").run(req.params.id);
-    if (result.changes === 0) return res.status(404).json({ error: 'Lead não encontrado' });
-    res.json({ message: 'Lead finalizado!' });
+app.put('/api/admin/leads/:id/finalizar', verifyToken, async (req, res) => {
+  try { await pool.query("UPDATE leads SET status = 'finalizado' WHERE id = $1", [req.params.id]); res.json({ message: 'Lead finalizado!' }); } 
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/stats', verifyToken, (req, res) => {
-    const totalLeads = db.prepare("SELECT COUNT(*) as total FROM leads").get();
-    const pendentes = db.prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'pendente'").get();
-    const finalizados = db.prepare("SELECT COUNT(*) as total FROM leads WHERE status = 'finalizado'").get();
-    const totalProjetos = db.prepare("SELECT COUNT(*) as total FROM projetos").get();
+app.get('/api/admin/stats', verifyToken, async (req, res) => {
+  try {
+    const totalLeads = await pool.query("SELECT COUNT(*) as total FROM leads");
+    const pendentes = await pool.query("SELECT COUNT(*) as total FROM leads WHERE status = 'pendente'");
+    const finalizados = await pool.query("SELECT COUNT(*) as total FROM leads WHERE status = 'finalizado'");
+    const totalProjetos = await pool.query("SELECT COUNT(*) as total FROM projetos");
     res.json({
-        totalLeads: totalLeads.total,
-        pendentes: pendentes.total,
-        finalizados: finalizados.total,
-        projetosTotal: totalProjetos.total
+      totalLeads: parseInt(totalLeads.rows[0].total),
+      pendentes: parseInt(pendentes.rows[0].total),
+      finalizados: parseInt(finalizados.rows[0].total),
+      projetosTotal: parseInt(totalProjetos.rows[0].total)
     });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Portfólio futurista rodando na porta ${PORT}`);
-    console.log(`📱 Acesse: http://localhost:${PORT}`);
-    console.log(`🔐 Admin: http://localhost:${PORT}/admin.html`);
+  console.log(`🚀 Portfólio futurista rodando na porta ${PORT}`);
+  console.log(`📱 Acesse: http://localhost:${PORT}`);
+  console.log(`🔐 Admin: http://localhost:${PORT}/admin.html`);
 });
