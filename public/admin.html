@@ -74,6 +74,12 @@
         margin: 10px 0;
         cursor: pointer;
     }
+    .error-msg {
+        color: #ff6666;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 0.8rem;
+    }
     @media (max-width: 768px) { 
         th, td { font-size: 0.7rem; padding: 6px; } 
         .btn-delete, .btn-finalizar { padding: 3px 8px; font-size: 0.65rem; }
@@ -86,9 +92,10 @@
 <body>
 <div id="login" class="login-container">
   <h2><i class="fas fa-brain"></i> Vinícius Admin</h2>
-  <input type="text" id="username" placeholder="Usuário" value="admin">
-  <input type="password" id="password" placeholder="Senha" value="Vini@Futuro2026#Secure">
+  <input type="text" id="username" placeholder="Usuário" value="">
+  <input type="password" id="password" placeholder="Senha" value="">
   <button onclick="login()">Acessar Nível 5</button>
+  <div id="login-error" class="error-msg" style="display:none;">❌ Usuário ou senha inválidos</div>
 </div>
 
 <div id="dashboard" class="dashboard">
@@ -178,68 +185,126 @@
 
 <script>
   let token = '';
+  let tentativas = 0;
+  const MAX_TENTATIVAS = 5;
+  
+  // Verificar se já tem sessão ativa (apenas na aba atual)
+  window.addEventListener('load', () => {
+    // NÃO carrega token automaticamente - segurança
+    // O usuário precisa logar a cada sessão
+  });
   
   async function login() {
-    const res = await fetch('/api/admin/login', { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify({ 
-        username: document.getElementById('username').value, 
-        password: document.getElementById('password').value 
-      }) 
-    });
-    if (res.ok) { 
-      const data = await res.json(); 
-      token = data.token; 
-      localStorage.setItem('portfolio_token', token); 
-      document.getElementById('login').style.display = 'none'; 
-      document.getElementById('dashboard').style.display = 'block'; 
-      loadDashboard(); 
-    } else alert('Falha na autenticação'); 
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('login-error');
+    
+    if (!username || !password) {
+      errorDiv.style.display = 'block';
+      errorDiv.innerText = '❌ Preencha usuário e senha';
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/admin/login', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ username, password }) 
+      });
+      
+      if (res.ok) { 
+        const data = await res.json(); 
+        token = data.token; 
+        // Salva token APENAS na memória (não no localStorage)
+        // Isso garante que ao fechar a aba, o login é perdido
+        document.getElementById('login').style.display = 'none'; 
+        document.getElementById('dashboard').style.display = 'block'; 
+        loadDashboard(); 
+        tentativas = 0;
+        errorDiv.style.display = 'none';
+      } else {
+        tentativas++;
+        errorDiv.style.display = 'block';
+        if (tentativas >= MAX_TENTATIVAS) {
+          errorDiv.innerText = '❌ Muitas tentativas. Aguarde 5 minutos.';
+          document.getElementById('username').disabled = true;
+          document.getElementById('password').disabled = true;
+          setTimeout(() => {
+            tentativas = 0;
+            document.getElementById('username').disabled = false;
+            document.getElementById('password').disabled = false;
+            errorDiv.innerText = '❌ Usuário ou senha inválidos';
+          }, 300000); // 5 minutos
+        } else {
+          errorDiv.innerText = `❌ Usuário ou senha inválidos (${MAX_TENTATIVAS - tentativas} tentativas restantes)`;
+        }
+      }
+    } catch(err) {
+      errorDiv.style.display = 'block';
+      errorDiv.innerText = '❌ Erro de conexão. Tente novamente.';
+    }
   }
   
-  function logout() { localStorage.removeItem('portfolio_token'); location.reload(); }
+  function logout() { 
+    token = ''; 
+    // Limpa o formulário
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('login').style.display = 'block'; 
+    document.getElementById('dashboard').style.display = 'none'; 
+    document.getElementById('login-error').style.display = 'none';
+    // Recarrega a página para limpar qualquer estado
+    location.reload();
+  }
   
   async function loadDashboard() { 
-    const saved = localStorage.getItem('portfolio_token'); 
-    if (saved) token = saved; 
-    if (!token) return;
+    if (!token) {
+      logout();
+      return;
+    }
     
-    const statsRes = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } }); 
-    const stats = await statsRes.json();
-    document.getElementById('stats').innerHTML = `
-      <div class="stat-card"><div class="number">${stats.totalLeads}</div><p>Total de Leads</p></div>
-      <div class="stat-card"><div class="number">${stats.pendentes || 0}</div><p>Pendentes</p></div>
-      <div class="stat-card"><div class="number">${stats.finalizados || 0}</div><p>Finalizados</p></div>
-      <div class="stat-card"><div class="number">${stats.projetosTotal}</div><p>Projetos Portfólio</p></div>
-    `;
-    
-    await carregarLeads();
-    await carregarPromocoes();
-    await carregarProjetos();
+    try {
+      const statsRes = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } }); 
+      if (statsRes.status === 403) {
+        logout();
+        return;
+      }
+      const stats = await statsRes.json();
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="number">${stats.totalLeads}</div><p>Total de Leads</p></div>
+        <div class="stat-card"><div class="number">${stats.pendentes || 0}</div><p>Pendentes</p></div>
+        <div class="stat-card"><div class="number">${stats.finalizados || 0}</div><p>Finalizados</p></div>
+        <div class="stat-card"><div class="number">${stats.projetosTotal}</div><p>Projetos Portfólio</p></div>
+      `;
+      
+      await carregarLeads();
+      await carregarPromocoes();
+      await carregarProjetos();
+    } catch(err) {
+      console.error('Erro ao carregar dashboard:', err);
+      logout();
+    }
   }
   
-  // Inicializar as abas
   function initTabs() {
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const tabId = tab.getAttribute('data-tab');
-        // Remove active de todas as tabs
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        // Esconde todos os conteudos
         document.querySelectorAll('.tab-content').forEach(content => {
           content.classList.remove('active');
         });
-        // Mostra o conteudo selecionado
         document.getElementById(tabId).classList.add('active');
       });
     });
   }
   
   async function carregarLeads() {
+    if (!token) return;
     const res = await fetch('/api/admin/leads', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.status === 403) { logout(); return; }
     const leads = await res.json();
     document.querySelector('#leads-table tbody').innerHTML = leads.map(l => `
       <tr>
@@ -280,7 +345,9 @@
   
   // ========== FUNÇÕES DE PROMOÇÕES ==========
   async function carregarPromocoes() {
+    if (!token) return;
     const res = await fetch('/api/admin/promocoes', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.status === 403) { logout(); return; }
     const promocoes = await res.json();
     document.querySelector('#promocoes-table tbody').innerHTML = promocoes.map(p => `
       <tr>
@@ -356,7 +423,9 @@
   
   // ========== FUNÇÕES DE PROJETOS ==========
   async function carregarProjetos() {
+    if (!token) return;
     const res = await fetch('/api/admin/projetos', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.status === 403) { logout(); return; }
     const projetos = await res.json();
     document.querySelector('#projetos-table tbody').innerHTML = projetos.map(p => `
       <tr>
@@ -439,15 +508,7 @@
     loadDashboard();
   }
   
-  // Inicializar após carregar
-  const saved = localStorage.getItem('portfolio_token'); 
-  if (saved) { 
-    token = saved; 
-    document.getElementById('login').style.display = 'none'; 
-    document.getElementById('dashboard').style.display = 'block'; 
-    loadDashboard();
-    initTabs();
-  }
+  initTabs();
 </script>
 </body>
 </html>
