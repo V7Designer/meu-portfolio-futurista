@@ -99,15 +99,6 @@ async function initDatabase() {
             console.log('✅ Projetos padrão inseridos');
         }
 
-        // Inserir promoção exemplo se não existir
-        const promocoes = await pool.query("SELECT * FROM promocoes");
-        if (promocoes.rows.length === 0) {
-            const validade = new Date();
-            validade.setDate(validade.getDate() + 2);
-            await pool.query(`INSERT INTO promocoes (titulo, descricao, preco_original, preco_promocional, bonus, data_validade, ativo) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                ['🔥 PROMOÇÃO RELÂMPAGO 🔥', 'Aproveite o desconto especial para os primeiros clientes!', 'R$ 800', 'R$ 450', '+ 1 mês de suporte gratuito', validade, 1]);
-            console.log('✅ Promoção exemplo criada');
-        }
 
         console.log('📁 Banco PostgreSQL conectado com sucesso!');
     } catch (err) {
