@@ -109,16 +109,23 @@
             <div class="name-container"><div class="name-back">VINICIUS</div><div class="name-front">Vinícius</div></div>
             <div class="glitch">// FULLSTACK DEVELOPER & FUTURISTIC DESIGNER</div>
             <p>Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.</p>
+            <p data-i18n="hero-text">Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.</p>
             <a href="#projetos" class="btn-primary">Ver Portfólio</a>
-            <a href="#contato" class="btn-whatsapp" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20quero%20um%20or%C3%A7amento%20para%20meu%20restaurante.', '_blank')"><i class="fab fa-whatsapp"></i> Falar com Especialista</a>
+            <a href="#projetos" class="btn-primary" data-i18n="hero-btn-portfolio">Ver Portfólio</a>
+            <a href="#contato" class="btn-whatsapp" data-i18n="hero-btn-whatsapp" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20quero%20um%20or%C3%A7amento%20para%20meu%20restaurante.', '_blank')"><i class="fab fa-whatsapp"></i> Falar com Especialista</a>
         </div>
     </section>
 
     <!-- SEÇÃO PROJETOS DE DEMONSTRAÇÃO -->
     <section id="projetos" class="section">
         <div class="container">
-            <h2 class="section-title">⚡ Projetos de Demonstração</h2>
-            <p class="section-subtitle" style="text-align: center; margin-bottom: 40px;">Sites completos criados para mostrar funcionalidades reais para restaurantes</p>
+            <h2 class="section-title" data-i18n="projects-title">⚡ Projetos de Demonstração</h2>
+            <h2 class="section-title" data-i18n="results-title">📊 Resultados que Entrego</h2>
+            <h2 class="section-title" data-i18n="testimonials-title">⭐ O que clientes dizem</h2>
+            <h2 class="section-title" data-i18n="plans-title">💰 Pacotes para seu Restaurante</h2>
+            <h2 class="section-title" data-i18n="about-title">👨‍💻 Sobre Mim</h2>
+            <h2 class="section-title" data-i18n="contact-title">📡 Fale Comigo</h2>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 40px;" data-i18n="projects-subtitle">Sites completos criados para mostrar funcionalidades reais para restaurantes</p>
             <div class="projects-grid" id="projects-grid">
                 <!-- Cards serão carregados via JavaScript -->
             </div>
@@ -191,9 +198,9 @@
         <div class="container">
             <h2 class="section-title">👨‍💻 Sobre Mim</h2>
             <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-                <p style="font-size: 1.2rem; margin-bottom: 20px;">Desenvolvedor fullstack de 17 anos, especializado em criar sites que vendem mais para restaurantes e pequenos negócios.</p>
-                <p style="color: #aaa; margin-bottom: 20px;">Entrega rápida, foco em resultados e design futurista. Cada site é feito sob medida para seu negócio, com painel administrativo fácil de usar.</p>
-                <a href="#contato" class="btn-primary">Vamos conversar →</a>
+                <p style="font-size: 1.2rem; margin-bottom: 20px;" data-i18n="about-text1">Desenvolvedor fullstack de 17 anos, especializado em criar sites que vendem mais para restaurantes e pequenos negócios.</p>
+                <p style="color: #aaa; margin-bottom: 20px;" data-i18n="about-text2">Entrega rápida, foco em resultados e design futurista. Cada site é feito sob medida para seu negócio, com painel administrativo fácil de usar.</p>
+                <a href="#contato" class="btn-primary" data-i18n="about-btn">Vamos conversar →</a>
             </div>
         </div>
     </section>
@@ -204,7 +211,8 @@
             <h2 class="section-title">📡 Fale Comigo</h2>
             <div style="max-width: 550px; margin: 0 auto; text-align: center;">
                 <a href="https://wa.me/5583988655944" class="btn-whatsapp" style="margin-bottom: 30px; display: inline-block;"><i class="fab fa-whatsapp"></i> Clique aqui e fale direto comigo no WhatsApp</a>
-                <p style="margin: 20px 0;">ou preencha o formulário:</p>
+                <p style="margin: 20px 0;" data-i18n="contact-form-text">ou preencha o formulário:</p>
+                <button type="submit" class="btn-primary" style="width:100%;" data-i18n="contact-submit">Enviar Mensagem</button>
                 <form id="contact-form">
                     <div class="form-group"><input type="text" id="nome" placeholder="Seu nome" required></div>
                     <div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" required></div>
@@ -236,25 +244,55 @@
 
     // TRADUÇÕES - CORRIGIDO (apenas uma declaração)
     const translations = {
-        pt: {
-            "nav-home": "Início",
-            "nav-projects": "Projetos",
-            "nav-results": "Resultados",
-            "nav-plans": "Planos",
-            "nav-about": "Sobre",
-            "nav-contact": "Contato",
-            "nav-admin": "Admin"
-        },
-        en: {
-            "nav-home": "Home",
-            "nav-projects": "Projects",
-            "nav-results": "Results",
-            "nav-plans": "Plans",
-            "nav-about": "About",
-            "nav-contact": "Contact",
-            "nav-admin": "Admin"
-        }
-    };
+    pt: {
+        "nav-home": "Início",
+        "nav-projects": "Projetos",
+        "nav-results": "Resultados",
+        "nav-plans": "Planos",
+        "nav-about": "Sobre",
+        "nav-contact": "Contato",
+        "nav-admin": "Admin",
+        "hero-text": "Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.",
+        "hero-btn-portfolio": "Ver Portfólio",
+        "hero-btn-whatsapp": "Falar com Especialista",
+        "projects-title": "⚡ Projetos de Demonstração",
+        "projects-subtitle": "Sites completos criados para mostrar funcionalidades reais para restaurantes",
+        "results-title": "📊 Resultados que Entrego",
+        "testimonials-title": "⭐ O que clientes dizem",
+        "plans-title": "💰 Pacotes para seu Restaurante",
+        "about-title": "👨‍💻 Sobre Mim",
+        "about-text1": "Desenvolvedor fullstack de 17 anos, especializado em criar sites que vendem mais para restaurantes e pequenos negócios.",
+        "about-text2": "Entrega rápida, foco em resultados e design futurista. Cada site é feito sob medida para seu negócio, com painel administrativo fácil de usar.",
+        "about-btn": "Vamos conversar →",
+        "contact-title": "📡 Fale Comigo",
+        "contact-form-text": "ou preencha o formulário:",
+        "contact-submit": "Enviar Mensagem"
+    },
+    en: {
+        "nav-home": "Home",
+        "nav-projects": "Projects",
+        "nav-results": "Results",
+        "nav-plans": "Plans",
+        "nav-about": "About",
+        "nav-contact": "Contact",
+        "nav-admin": "Admin",
+        "hero-text": "I create futuristic digital experiences that transform businesses. Complete websites with admin panels, delivery systems, and cutting-edge design.",
+        "hero-btn-portfolio": "View Portfolio",
+        "hero-btn-whatsapp": "Talk to Specialist",
+        "projects-title": "⚡ Demonstration Projects",
+        "projects-subtitle": "Complete websites created to show real functionalities for restaurants",
+        "results-title": "📊 Results I Deliver",
+        "testimonials-title": "⭐ What clients say",
+        "plans-title": "💰 Packages for your Restaurant",
+        "about-title": "👨‍💻 About Me",
+        "about-text1": "17-year-old fullstack developer, specialized in creating websites that sell more for restaurants and small businesses.",
+        "about-text2": "Fast delivery, focus on results and futuristic design. Each website is custom-made for your business, with an easy-to-use admin panel.",
+        "about-btn": "Let's talk →",
+        "contact-title": "📡 Contact Me",
+        "contact-form-text": "or fill out the form:",
+        "contact-submit": "Send Message"
+    }
+};
 
     function toggleLanguage() {
         currentLang = currentLang === 'pt' ? 'en' : 'pt';
