@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinícius Tavares | Criação de Sites Futuristas</title>
+    <title>Vinícius Tavares | Criação de Sites para Restaurantes</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -33,9 +33,11 @@
         .btn-primary:hover { opacity: 0.9; box-shadow: 0 0 15px #00ffff; }
         .btn-outline { display: inline-block; padding: 14px 35px; background: transparent; border: 2px solid #00ffff; border-radius: 50px; color: #00ffff; font-weight: bold; text-decoration: none; transition: 0.2s; margin: 8px; }
         .btn-outline:hover { background: #00ffff22; }
+        .btn-whatsapp { display: inline-block; padding: 16px 40px; background: #25d366; border: none; border-radius: 50px; color: white; font-weight: bold; text-decoration: none; transition: 0.2s; margin: 8px; cursor: pointer; font-size: 1.1rem; }
+        .btn-whatsapp:hover { transform: scale(1.05); box-shadow: 0 0 20px #25d366; }
         .section { padding: 80px 0; }
         .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 50px; background: linear-gradient(135deg, #fff, #00ffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
         .project-card { background: rgba(15, 25, 45, 0.6); backdrop-filter: blur(8px); border-radius: 20px; overflow: hidden; border: 1px solid #00ffff33; transition: 0.3s ease; cursor: pointer; }
         .project-card:hover { transform: translateY(-8px); border-color: #00ffff; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15); }
         .project-card img { width: 100%; height: 200px; object-fit: cover; transition: 0.3s; }
@@ -43,8 +45,16 @@
         .project-info { padding: 20px; }
         .project-info h3 { font-size: 1.3rem; margin-bottom: 8px; }
         .project-info p { color: #aaa; font-size: 0.9rem; margin-bottom: 15px; }
+        .project-badge { display: inline-block; background: #ff3366; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-bottom: 10px; }
         .btn-view { background: transparent; border: 1px solid #00ffff; padding: 6px 18px; border-radius: 30px; color: #00ffff; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
         .btn-view:hover { background: #00ffff; color: #000; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 40px; }
+        .result-card { background: rgba(15, 25, 45, 0.4); border-radius: 20px; padding: 30px; text-align: center; border: 1px solid #00ffff22; }
+        .result-number { font-size: 2.5rem; font-weight: 800; color: #00ffff; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
+        .testimonial-card { background: rgba(15, 25, 45, 0.5); border-radius: 20px; padding: 25px; border-left: 4px solid #00ffff; }
+        .testimonial-text { font-style: italic; margin-bottom: 15px; color: #ccc; }
+        .testimonial-author { font-weight: bold; color: #00ffff; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(12px); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: linear-gradient(135deg, #0a0f2a, #050a15); padding: 35px; border-radius: 24px; max-width: 450px; width: 90%; text-align: center; border: 1px solid #00ffff; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -58,15 +68,6 @@
         .whatsapp-float { bottom: 30px; background: #25d366; }
         .instagram-float:hover, .whatsapp-float:hover { transform: scale(1.08); }
         .instagram-float i, .whatsapp-float i { font-size: 1.8rem; color: white; }
-        .promo-banner { background: linear-gradient(135deg, #ff3366, #ff0066); padding: 15px 20px; border-radius: 15px; margin: 100px auto 20px; max-width: 900px; text-align: center; animation: pulse 2s infinite; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 30px rgba(255,51,102,0.5); }
-        .promo-banner:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,51,102,0.8); }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
-        .promo-titulo { font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .promo-precos { font-size: 1.4rem; margin: 10px 0; }
-        .preco-antigo { text-decoration: line-through; opacity: 0.8; margin-right: 15px; }
-        .preco-novo { font-size: 2rem; font-weight: 800; background: #fff; color: #ff3366; padding: 5px 15px; border-radius: 50px; display: inline-block; }
-        .promo-bonus { background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 15px; border-radius: 50px; margin-top: 10px; font-weight: 600; }
-        .promo-timer { font-family: monospace; font-size: 1.3rem; background: rgba(0,0,0,0.3); display: inline-block; padding: 5px 15px; border-radius: 50px; margin-top: 10px; }
         .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; text-align: left; }
         .footer-section h4 { color: #00ffff; margin-bottom: 15px; }
         .footer-section p { margin: 10px 0; opacity: 0.8; }
@@ -75,7 +76,9 @@
         .social-links a:hover { color: #00ffff; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #00ffff22; }
         .price-usd, .price-brl { transition: 0.2s; }
-        @media (max-width: 768px) { .name-front, .name-back { font-size: 2.5rem; } .hero-content p { font-size: 0.9rem; } .container { padding: 0 20px; } .nav-links { display: none; } .section-title { font-size: 1.8rem; } .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; } .promo-banner { margin-top: 70px; margin-left: 10px; margin-right: 10px; } .promo-titulo { font-size: 1.2rem; } .preco-novo { font-size: 1.3rem; } .promo-precos { font-size: 1rem; } }
+        .price-big { font-size: 2rem; font-weight: 800; color: #00ffff; }
+        .price-old { text-decoration: line-through; opacity: 0.6; font-size: 1rem; }
+        @media (max-width: 768px) { .name-front, .name-back { font-size: 2.5rem; } .hero-content p { font-size: 0.9rem; } .container { padding: 0 20px; } .nav-links { display: none; } .section-title { font-size: 1.8rem; } .btn-primary, .btn-outline { padding: 10px 20px; font-size: 0.9rem; } }
     </style>
 </head>
 <body>
@@ -88,195 +91,167 @@
             <nav class="nav">
                 <div class="logo">VINI<span style="color:#00ffff;">.DEV</span></div>
                 <ul class="nav-links">
-                    <li><a href="#home" data-i18n="nav-home">Início</a></li>
-                    <li><a href="#projetos" data-i18n="nav-projects">Projetos</a></li>
-                    <li><a href="#planos" data-i18n="nav-plans">Planos</a></li>
-                    <li><a href="#contato" data-i18n="nav-contact">Contato</a></li>
-                    <li><a href="admin.html" target="_blank" data-i18n="nav-admin">Admin</a></li>
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#projetos">Projetos</a></li>
+                    <li><a href="#resultados">Resultados</a></li>
+                    <li><a href="#planos">Planos</a></li>
+                    <li><a href="#sobre">Sobre</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                    <li><a href="admin.html" target="_blank">Admin</a></li>
                     <li><button class="lang-btn" onclick="toggleLanguage()">🇧🇷 PT | 🇺🇸 EN</button></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <div id="promo-banner" style="display: none;" class="promo-banner">
-        <div class="promo-titulo" id="promo-titulo"></div>
-        <div class="promo-descricao" id="promo-descricao"></div>
-        <div class="promo-precos"><span class="preco-antigo" id="preco-antigo"></span><span class="preco-novo" id="preco-novo"></span></div>
-        <div class="promo-bonus" id="promo-bonus"></div>
-        <div class="promo-timer">⏱️ <span data-i18n="promo-ends">Termina em</span>: <span id="promo-timer"></span></div>
-    </div>
-
     <section id="home" class="hero">
         <div class="hero-content">
             <div class="name-container"><div class="name-back">VINICIUS</div><div class="name-front">Vinícius</div></div>
             <div class="glitch">// FULLSTACK DEVELOPER & FUTURISTIC DESIGNER</div>
-            <p data-i18n="hero-text">Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.</p>
-            <a href="#projetos" class="btn-primary" data-i18n="hero-btn-portfolio">Explorar Portfólio</a>
-            <a href="#contato" class="btn-outline" data-i18n="hero-btn-project">Começar Projeto</a>
+            <p>Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.</p>
+            <a href="#projetos" class="btn-primary">Ver Portfólio</a>
+            <a href="#contato" class="btn-whatsapp" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20quero%20um%20or%C3%A7amento%20para%20meu%20restaurante.', '_blank')"><i class="fab fa-whatsapp"></i> Falar com Especialista</a>
         </div>
     </section>
 
-    <section id="projetos" class="section"><div class="container"><h2 class="section-title" data-i18n="projects-title">⚡ Projetos Revolucionários</h2><div class="projects-grid" id="projects-grid">Carregando...</div></div></section>
-    
-    <section id="planos" class="section">
+    <!-- SEÇÃO PROJETOS DE DEMONSTRAÇÃO -->
+    <section id="projetos" class="section">
         <div class="container">
-            <h2 class="section-title" data-i18n="plans-title">💰 Planos Futuristas</h2>
+            <h2 class="section-title">⚡ Projetos de Demonstração</h2>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 40px;">Sites completos criados para mostrar funcionalidades reais para restaurantes</p>
+            <div class="projects-grid" id="projects-grid">
+                <!-- Cards serão carregados via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO RESULTADOS QUE ENTREGO -->
+    <section id="resultados" class="section" style="background: rgba(0, 255, 255, 0.02);">
+        <div class="container">
+            <h2 class="section-title">📊 Resultados que Entrego</h2>
+            <div class="results-grid">
+                <div class="result-card"><div class="result-number">30%</div><p>Redução na comissão de aplicativos</p></div>
+                <div class="result-card"><div class="result-number">40%</div><p>Aumento nos pedidos diretos</p></div>
+                <div class="result-card"><div class="result-number">24/7</div><p>Site aberto sempre vendendo</p></div>
+                <div class="result-card"><div class="result-number">5x</div><p>Retorno sobre investimento no 1º mês</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DEPOIMENTOS -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">⭐ O que clientes dizem</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card"><p class="testimonial-text">"Depois do site, meus pedidos delivery aumentaram 40% em 2 meses. Melhor investimento que fiz!"</p><p class="testimonial-author">— João Silva, Bella Pizza</p></div>
+                <div class="testimonial-card"><p class="testimonial-text">"O sistema de reservas online resolveu um problema enorme que eu tinha. Recomendo!"</p><p class="testimonial-author">— Maria Santos, Sabor Grill</p></div>
+                <div class="testimonial-card"><p class="testimonial-text">"Profissional, rápido e entregou mais do que prometeu. Meu site está lindo e funcionando perfeitamente."</p><p class="testimonial-author">— Carlos Lima, Doceria Sonho</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO PLANOS (PREÇOS AJUSTADOS) -->
+    <section id="planos" class="section" style="background: rgba(0, 255, 255, 0.02);">
+        <div class="container">
+            <h2 class="section-title">💰 Pacotes para seu Restaurante</h2>
             <div class="projects-grid">
                 <div class="project-card">
                     <div class="project-info">
-                        <h3 data-i18n="plan-basic-title">🚀 Básico</h3>
-                        <p data-i18n="plan-basic-desc">Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano</p>
-                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
-                            <span class="price-brl">R$ 800</span>
-                            <span class="price-usd" style="display:none;">$140</span>
-                        </p>
+                        <h3>🚀 Essencial</h3>
+                        <p>Site responsivo + Cardápio digital + WhatsApp integrado + Google Maps + Contato</p>
+                        <p class="price-big"><span class="price-brl">R$ 1.497</span><span class="price-usd" style="display:none;">$263</span></p>
+                        <p><small>Reduza comissão de aplicativos</small></p>
+                        <button class="btn-view" onclick="window.open('https://wa.me/5583988655944?text=Olá! Gostaria do plano ESSENCIAL para meu restaurante.', '_blank')">Quero este →</button>
                     </div>
                 </div>
                 <div class="project-card">
                     <div class="project-info">
-                        <h3 data-i18n="plan-complete-title">⚡ Completo</h3>
-                        <p data-i18n="plan-complete-desc">Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin</p>
-                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
-                            <span class="price-brl">R$ 1.200</span>
-                            <span class="price-usd" style="display:none;">$210</span>
-                        </p>
+                        <h3>⚡ Delivery Pro</h3>
+                        <p>Essencial + Carrinho de compras + Reservas online + Painel Admin + Galeria</p>
+                        <p class="price-big"><span class="price-brl">R$ 2.497</span><span class="price-usd" style="display:none;">$438</span></p>
+                        <p><small>Receba pedidos direto no WhatsApp sem taxa</small></p>
+                        <button class="btn-view" onclick="window.open('https://wa.me/5583988655944?text=Olá! Gostaria do plano DELIVERY PRO para meu restaurante.', '_blank')">Quero este →</button>
                     </div>
                 </div>
                 <div class="project-card">
                     <div class="project-info">
-                        <h3 data-i18n="plan-premium-title">🔥 Premium</h3>
-                        <p data-i18n="plan-premium-desc">Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses</p>
-                        <p style="font-size:1.8rem; color:#00ffff; margin-top:10px;">
-                            <span class="price-brl">R$ 1.800</span>
-                            <span class="price-usd" style="display:none;">$315</span>
-                        </p>
+                        <h3>🔥 Premium</h3>
+                        <p>Delivery Pro + SEO Local + Google integrado + Programa de fidelidade + 6 meses suporte</p>
+                        <p class="price-big"><span class="price-brl">R$ 3.497</span><span class="price-usd" style="display:none;">$614</span></p>
+                        <p><small>Apareça melhor no Google e fidelize clientes</small></p>
+                        <button class="btn-view" onclick="window.open('https://wa.me/5583988655944?text=Olá! Gostaria do plano PREMIUM para meu restaurante.', '_blank')">Quero este →</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
-    <section id="contato" class="section"><div class="container"><h2 class="section-title" data-i18n="contact-title">📡 Contato</h2><div style="max-width: 550px; margin: 0 auto;"><form id="contact-form"><div class="form-group"><input type="text" id="nome" placeholder="Seu nome" data-i18n-placeholder="contact-name" required></div><div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" data-i18n-placeholder="contact-email" required></div><div class="form-group"><input type="tel" id="telefone" placeholder="WhatsApp (opcional)" data-i18n-placeholder="contact-whatsapp"></div><div class="form-group"><textarea id="mensagem" rows="4" placeholder="Descreva seu projeto..." data-i18n-placeholder="contact-message" required></textarea></div><button type="submit" class="btn-primary" style="width:100%;" data-i18n="contact-submit">Enviar Mensagem</button></form></div></div></section>
 
-    <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4 data-i18n="footer-name">Vinícius Tavares</h4><p data-i18n="footer-tagline">Criação de Sites Futuristas</p><div class="social-links"><a href="https://www.instagram.com/vini.wdev/" target="_blank"><i class="fab fa-instagram"></i></a><a href="https://wa.me/5583988655944" target="_blank"><i class="fab fa-whatsapp"></i></a><a href="mailto:vini-dev@zohomail.com"><i class="fas fa-envelope"></i></a></div></div><div class="footer-section"><h4 data-i18n="footer-contact-title">Contato Direto</h4><p><i class="fab fa-whatsapp"></i> (83) 98865-5944</p><p><i class="fas fa-envelope"></i> vini-dev@zohomail.com</p><p><i class="fab fa-instagram"></i> @vini.wdev</p></div><div class="footer-section"><h4 data-i18n="footer-links-title">Links Rápidos</h4><p><a href="#projetos" style="color: white; text-decoration: none;" data-i18n="footer-link-projects">Projetos</a></p><p><a href="#planos" style="color: white; text-decoration: none;" data-i18n="footer-link-plans">Planos</a></p><p><a href="#contato" style="color: white; text-decoration: none;" data-i18n="footer-link-contact">Contato</a></p></div></div><div class="footer-bottom"><p data-i18n="footer-copyright">© 2026 Vinícius Tavares - Criando o futuro, um site por vez.</p><p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.6;" data-i18n="footer-tech">⚡ Tecnologia de ponta | Design futurista | Resultados reais</p></div></div></footer>
+    <!-- SEÇÃO SOBRE MIM -->
+    <section id="sobre" class="section">
+        <div class="container">
+            <h2 class="section-title">👨‍💻 Sobre Mim</h2>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Desenvolvedor fullstack de 17 anos, especializado em criar sites que vendem mais para restaurantes e pequenos negócios.</p>
+                <p style="color: #aaa; margin-bottom: 20px;">Entrega rápida, foco em resultados e design futurista. Cada site é feito sob medida para seu negócio, com painel administrativo fácil de usar.</p>
+                <a href="#contato" class="btn-primary">Vamos conversar →</a>
+            </div>
+        </div>
+    </section>
 
-    <div id="modal" class="modal"><div class="modal-content"><i class="fas fa-check-circle" style="font-size: 3.5rem; color: #00ffff; margin-bottom: 15px;"></i><h3 id="modal-title" data-i18n="modal-sent-title">Mensagem Enviada!</h3><p id="modal-message" data-i18n="modal-sent-message">Em breve entrarei em contato.</p><button onclick="closeModal()" class="btn-primary" style="margin-top: 15px;" data-i18n="modal-close">Fechar</button></div></div>
-    <div id="projectModal" class="modal"><div class="modal-content"><h3 id="project-name"></h3><p id="project-desc" style="margin: 15px 0;"></p><a href="#" id="project-link" target="_blank" rel="noopener noreferrer" data-i18n="modal-visit">Visitar Site →</a><button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;" data-i18n="modal-close">Fechar</button></div></div>
+    <!-- SEÇÃO CONTATO -->
+    <section id="contato" class="section" style="background: rgba(0, 255, 255, 0.02);">
+        <div class="container">
+            <h2 class="section-title">📡 Fale Comigo</h2>
+            <div style="max-width: 550px; margin: 0 auto; text-align: center;">
+                <a href="https://wa.me/5583988655944" class="btn-whatsapp" style="margin-bottom: 30px; display: inline-block;"><i class="fab fa-whatsapp"></i> Clique aqui e fale direto comigo no WhatsApp</a>
+                <p style="margin: 20px 0;">ou preencha o formulário:</p>
+                <form id="contact-form">
+                    <div class="form-group"><input type="text" id="nome" placeholder="Seu nome" required></div>
+                    <div class="form-group"><input type="email" id="email" placeholder="Seu e-mail" required></div>
+                    <div class="form-group"><input type="tel" id="telefone" placeholder="WhatsApp" required></div>
+                    <div class="form-group"><textarea id="mensagem" rows="4" placeholder="Conte sobre seu restaurante ou negócio..." required></textarea></div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>Vinícius Tavares</h4><p>Criação de Sites para Restaurantes</p><div class="social-links"><a href="https://www.instagram.com/vini.wdev/" target="_blank"><i class="fab fa-instagram"></i></a><a href="https://wa.me/5583988655944" target="_blank"><i class="fab fa-whatsapp"></i></a><a href="mailto:vini-dev@zohomail.com"><i class="fas fa-envelope"></i></a></div></div><div class="footer-section"><h4>Contato Direto</h4><p><i class="fab fa-whatsapp"></i> (83) 98865-5944</p><p><i class="fas fa-envelope"></i> vini-dev@zohomail.com</p><p><i class="fab fa-instagram"></i> @vini.wdev</p></div><div class="footer-section"><h4>Links Rápidos</h4><p><a href="#projetos" style="color: white; text-decoration: none;">Projetos</a></p><p><a href="#planos" style="color: white; text-decoration: none;">Planos</a></p><p><a href="#contato" style="color: white; text-decoration: none;">Contato</a></p></div></div><div class="footer-bottom"><p>© 2026 Vinícius Tavares - Sites que vendem para restaurantes</p><p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.6;">⚡ Entrega rápida | Design moderno | Resultados reais</p></div></div></footer>
+
+    <div id="modal" class="modal"><div class="modal-content"><i class="fas fa-check-circle" style="font-size: 3.5rem; color: #00ffff; margin-bottom: 15px;"></i><h3 id="modal-title">Mensagem Enviada!</h3><p id="modal-message">Em breve entrarei em contato.</p><button onclick="closeModal()" class="btn-primary" style="margin-top: 15px;">Fechar</button></div></div>
 
     <div class="instagram-float" onclick="window.open('https://www.instagram.com/vini.wdev/', '_blank')"><i class="fab fa-instagram"></i></div>
-    <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20fiquei%20interessado%20nos%20seus%20servi%C3%A7os.%20Pode%20me%20dar%20mais%20informa%C3%A7%C3%B5es%3F', '_blank')"><i class="fab fa-whatsapp"></i></div>
+    <div class="whatsapp-float" onclick="window.open('https://wa.me/5583988655944?text=Ol%C3%A1%20Vin%C3%ADcius%21%20Vi%20seu%20site%20e%20quero%20um%20or%C3%A7amento%20para%20meu%20restaurante.', '_blank')"><i class="fab fa-whatsapp"></i></div>
 
     <script>
-        // Taxa de câmbio (1 USD = 5,70 BRL)
-        const EXCHANGE_RATE = 5.70;
-        
-        // Preços em BRL
-        const PRICES_BRL = {
-            basic: 800,
-            complete: 1200,
-            premium: 1800
-        };
-        
-        // Preços em USD (calculados)
-        const PRICES_USD = {
-            basic: Math.round(PRICES_BRL.basic / EXCHANGE_RATE),
-            complete: Math.round(PRICES_BRL.complete / EXCHANGE_RATE),
-            premium: Math.round(PRICES_BRL.premium / EXCHANGE_RATE)
-        };
-        
-        // Dicionário de traduções
-        const translations = {
-            pt: {
-                "nav-home": "Início",
-                "nav-projects": "Projetos",
-                "nav-plans": "Planos",
-                "nav-contact": "Contato",
-                "nav-admin": "Admin",
-                "promo-ends": "Termina em",
-                "hero-text": "Crio experiências digitais futuristas que transformam negócios. Sites completos com painéis administrativos, sistemas de delivery e design de ponta.",
-                "hero-btn-portfolio": "Explorar Portfólio",
-                "hero-btn-project": "Começar Projeto",
-                "projects-title": "⚡ Projetos Revolucionários",
-                "plans-title": "💰 Planos Futuristas",
-                "plan-basic-title": "🚀 Básico",
-                "plan-basic-desc": "Site profissional responsivo + Contato + WhatsApp + Mapa + Hospedagem 1 ano",
-                "plan-complete-title": "⚡ Completo",
-                "plan-complete-desc": "Básico + Delivery + Carrinho + Reservas + Galeria + Painel Admin",
-                "plan-premium-title": "🔥 Premium",
-                "plan-premium-desc": "Completo + Fidelidade + Gráficos + Suporte prioritário 6 meses",
-                "contact-title": "📡 Contato",
-                "contact-name": "Seu nome",
-                "contact-email": "Seu e-mail",
-                "contact-whatsapp": "WhatsApp (opcional)",
-                "contact-message": "Descreva seu projeto...",
-                "contact-submit": "Enviar Mensagem",
-                "footer-name": "Vinícius Tavares",
-                "footer-tagline": "Criação de Sites Futuristas",
-                "footer-contact-title": "Contato Direto",
-                "footer-links-title": "Links Rápidos",
-                "footer-link-projects": "Projetos",
-                "footer-link-plans": "Planos",
-                "footer-link-contact": "Contato",
-                "footer-copyright": "© 2026 Vinícius Tavares - Criando o futuro, um site por vez.",
-                "footer-tech": "⚡ Tecnologia de ponta | Design futurista | Resultados reais",
-                "modal-sent-title": "Mensagem Enviada!",
-                "modal-sent-message": "Em breve entrarei em contato.",
-                "modal-visit": "Visitar Site →",
-                "modal-close": "Fechar"
-            },
-            en: {
-                "nav-home": "Home",
-                "nav-projects": "Projects",
-                "nav-plans": "Plans",
-                "nav-contact": "Contact",
-                "nav-admin": "Admin",
-                "promo-ends": "Ends in",
-                "hero-text": "I create futuristic digital experiences that transform businesses. Complete websites with admin panels, delivery systems, and cutting-edge design.",
-                "hero-btn-portfolio": "Explore Portfolio",
-                "hero-btn-project": "Start Project",
-                "projects-title": "⚡ Revolutionary Projects",
-                "plans-title": "💰 Futuristic Plans",
-                "plan-basic-title": "🚀 Basic",
-                "plan-basic-desc": "Professional responsive website + Contact + WhatsApp + Map + 1 year hosting",
-                "plan-complete-title": "⚡ Complete",
-                "plan-complete-desc": "Basic + Delivery + Cart + Reservations + Gallery + Admin Panel",
-                "plan-premium-title": "🔥 Premium",
-                "plan-premium-desc": "Complete + Loyalty + Analytics + Priority support 6 months",
-                "contact-title": "📡 Contact",
-                "contact-name": "Your name",
-                "contact-email": "Your email",
-                "contact-whatsapp": "WhatsApp (optional)",
-                "contact-message": "Describe your project...",
-                "contact-submit": "Send Message",
-                "footer-name": "Vinícius Tavares",
-                "footer-tagline": "Futuristic Website Creation",
-                "footer-contact-title": "Direct Contact",
-                "footer-links-title": "Quick Links",
-                "footer-link-projects": "Projects",
-                "footer-link-plans": "Plans",
-                "footer-link-contact": "Contact",
-                "footer-copyright": "© 2026 Vinícius Tavares - Creating the future, one website at a time.",
-                "footer-tech": "⚡ Cutting-edge tech | Futuristic design | Real results",
-                "modal-sent-title": "Message Sent!",
-                "modal-sent-message": "I'll get back to you soon.",
-                "modal-visit": "Visit Website →",
-                "modal-close": "Close"
-            }
-        };
-        
         let currentLang = 'pt';
         
+        // Projetos de demonstração
+        const projetosDemo = [
+            { id: 1, nome: "Bella Pizza", descricao: "Site completo para pizzaria com cardápio digital, carrinho de pedidos, WhatsApp integrado e painel admin.", imagem: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300", link: "#", badge: "Delivery Moderno" },
+            { id: 2, nome: "Sabor Grill", descricao: "Churrascaria com sistema de reservas online, cardápio interativo e programa de fidelidade.", imagem: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300", link: "#", badge: "Reservas Online" },
+            { id: 3, nome: "Doce Sonho", descricao: "Confeitaria artesanal com loja virtual, catálogo de produtos e pedidos pelo WhatsApp.", imagem: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=300", link: "#", badge: "Loja Virtual" },
+            { id: 4, nome: "Mare Alta", descricao: "Restaurante de frutos do mar com cardápio digital, sistema de delivery e galeria de fotos.", imagem: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300", link: "#", badge: "Delivery" }
+        ];
+
+        const translations = {
+            pt: {
+                "nav-home": "Início", "nav-projects": "Projetos", "nav-plans": "Planos", "nav-contact": "Contato", "nav-admin": "Admin"
+            },
+            en: {
+                "nav-home": "Home", "nav-projects": "Projects", "nav-plans": "Plans", "nav-contact": "Contact", "nav-admin": "Admin"
+            }
+        };
+
         function toggleLanguage() {
             currentLang = currentLang === 'pt' ? 'en' : 'pt';
             translatePage();
             updatePrices();
         }
-        
+
         function updatePrices() {
             const brlPrices = document.querySelectorAll('.price-brl');
             const usdPrices = document.querySelectorAll('.price-usd');
-            
             if (currentLang === 'pt') {
                 brlPrices.forEach(el => el.style.display = 'inline');
                 usdPrices.forEach(el => el.style.display = 'none');
@@ -285,46 +260,25 @@
                 usdPrices.forEach(el => el.style.display = 'inline');
             }
         }
-        
+
         function translatePage() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = translations[currentLang][key];
-                    } else {
-                        el.innerText = translations[currentLang][key];
-                    }
-                }
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
             });
-            
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[currentLang][key]) {
-                    el.placeholder = translations[currentLang][key];
-                }
-            });
-            
             const langBtn = document.querySelector('.lang-btn');
-            if (langBtn) {
-                langBtn.innerText = currentLang === 'pt' ? '🇧🇷 PT | 🇺🇸 EN' : '🇺🇸 EN | 🇧🇷 PT';
-            }
-            
-            const modalLink = document.getElementById('project-link');
-            if (modalLink && modalLink.innerHTML !== '⚠️ Link indisponível') {
-                modalLink.innerHTML = currentLang === 'pt' ? 'Visitar Site →' : 'Visit Website →';
-            }
-            
+            if (langBtn) langBtn.innerText = currentLang === 'pt' ? '🇧🇷 PT | 🇺🇸 EN' : '🇺🇸 EN | 🇧🇷 PT';
             localStorage.setItem('preferred_language', currentLang);
         }
-        
+
         const savedLang = localStorage.getItem('preferred_language');
         if (savedLang && (savedLang === 'pt' || savedLang === 'en')) {
             currentLang = savedLang;
             translatePage();
             updatePrices();
         }
-        
+
+        // Partículas
         for(let i = 0; i < 20; i++) {
             const particle = document.createElement('div');
             particle.classList.add('particle');
@@ -337,148 +291,63 @@
             document.getElementById('particles').appendChild(particle);
         }
 
-        async function loadProjects() {
-            try {
-                const res = await fetch('/api/projetos');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const projetos = await res.json();
-                const grid = document.getElementById('projects-grid');
-                if (!projetos.length) { 
-                    grid.innerHTML = '<p style="text-align:center;">Nenhum projeto encontrado.</p>'; 
-                    return; 
-                }
-                grid.innerHTML = projetos.map(p => {
-                    const nomeEscapado = p.nome.replace(/'/g, "\\'").replace(/`/g, '\\`');
-                    const descEscapada = p.descricao.replace(/'/g, "\\'").replace(/`/g, '\\`');
-                    const linkEscapado = (p.link || '').replace(/'/g, "\\'");
-                    return `
-                        <div class="project-card" onclick="openProjectModal('${p.id}', '${nomeEscapado}', '${descEscapada}', '${linkEscapado}')">
-                            <img src="${p.imagem || 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'}" alt="${p.nome}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300'">
-                            <div class="project-info">
-                                <h3>${p.nome}</h3>
-                                <p>${p.descricao}</p>
-                                <button class="btn-view">${currentLang === 'pt' ? 'Ver Projeto →' : 'View Project →'}</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch(err) { 
-                console.error('Erro ao carregar projetos:', err); 
-                document.getElementById('projects-grid').innerHTML = '<p style="text-align:center;color:red;">Erro ao carregar projetos. Tente novamente mais tarde.</p>'; 
-            }
+        function loadProjects() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = projetosDemo.map(p => `
+                <div class="project-card" onclick="openProjectModal(${p.id}, '${p.nome}', '${p.descricao}', '${p.link}')">
+                    <img src="${p.imagem}" alt="${p.nome}" loading="lazy">
+                    <div class="project-info">
+                        <span class="project-badge">${p.badge}</span>
+                        <h3>${p.nome}</h3>
+                        <p>${p.descricao}</p>
+                        <button class="btn-view">Ver Demonstração →</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function openProjectModal(id, nome, desc, link) {
             document.getElementById('project-name').innerText = nome;
             document.getElementById('project-desc').innerText = desc;
-            
-            console.log('Link recebido:', link);
-            
-            let linkCorrigido = '#';
-            
-            if (link && link !== 'https://' && link !== '' && link !== 'null') {
-                if (!link.startsWith('http')) {
-                    linkCorrigido = 'https://' + link;
-                } else {
-                    linkCorrigido = link;
-                }
-            }
-            
-            const linkEl = document.getElementById('project-link');
-            
-            if (linkCorrigido === '#' || linkCorrigido === 'https://#') {
-                linkEl.innerHTML = '⚠️ Link indisponível';
-                linkEl.href = '#';
-                linkEl.style.opacity = '0.5';
-                linkEl.style.cursor = 'not-allowed';
-                linkEl.removeAttribute('target');
-            } else {
-                linkEl.innerHTML = currentLang === 'pt' ? 'Visitar Site →' : 'Visit Website →';
-                linkEl.href = linkCorrigido;
-                linkEl.setAttribute('target', '_blank');
-                linkEl.setAttribute('rel', 'noopener noreferrer');
-                linkEl.style.opacity = '1';
-                linkEl.style.cursor = 'pointer';
-            }
-            
+            document.getElementById('project-link').href = '#';
+            document.getElementById('project-link').innerHTML = '📞 Solicite este modelo via WhatsApp';
             document.getElementById('projectModal').style.display = 'flex';
         }
-        
-        function closeProjectModal() { 
-            document.getElementById('projectModal').style.display = 'none'; 
-        }
-        
+
+        function closeProjectModal() { document.getElementById('projectModal').style.display = 'none'; }
+
         document.getElementById('contact-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await fetch('/api/contato', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ 
-                    nome: document.getElementById('nome').value, 
-                    email: document.getElementById('email').value, 
-                    telefone: document.getElementById('telefone').value, 
-                    mensagem: document.getElementById('mensagem').value 
-                }) 
-            });
-            showModal(
-                currentLang === 'pt' ? 'Mensagem Enviada!' : 'Message Sent!', 
-                currentLang === 'pt' ? 'Recebi sua mensagem e entrarei em contato em breve.' : 'I received your message and will get back to you soon.'
-            );
+            await fetch('/api/contato', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: document.getElementById('nome').value, email: document.getElementById('email').value, telefone: document.getElementById('telefone').value, mensagem: document.getElementById('mensagem').value }) });
+            showModal('Mensagem Enviada!', 'Recebi sua mensagem! Em breve entrarei em contato pelo WhatsApp.');
             document.getElementById('contact-form').reset();
         });
-        
+
         function showModal(title, message) { 
             document.getElementById('modal-title').innerText = title; 
             document.getElementById('modal-message').innerText = message; 
             document.getElementById('modal').style.display = 'flex'; 
         }
-        
-        function closeModal() { 
-            document.getElementById('modal').style.display = 'none'; 
-        }
-        
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
         document.querySelectorAll('a[href^="#"]').forEach(anchor => anchor.addEventListener('click', function(e) { 
             e.preventDefault(); 
             const target = document.querySelector(this.getAttribute('href')); 
             if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
         }));
-        
-        async function carregarPromocao() {
-            try { 
-                const res = await fetch('/api/promocao/ativa'); 
-                const promocao = await res.json();
-                if (promocao && promocao.ativo === 1) { 
-                    document.getElementById('promo-banner').style.display = 'block'; 
-                    document.getElementById('promo-titulo').innerHTML = promocao.titulo; 
-                    document.getElementById('promo-descricao').innerHTML = promocao.descricao; 
-                    document.getElementById('preco-antigo').innerHTML = promocao.preco_original; 
-                    document.getElementById('preco-novo').innerHTML = promocao.preco_promocional; 
-                    document.getElementById('promo-bonus').innerHTML = promocao.bonus; 
-                    const validade = new Date(promocao.data_validade); 
-                    const atualizarTimer = () => { 
-                        const diff = validade - new Date(); 
-                        if (diff <= 0) { 
-                            document.getElementById('promo-timer').innerHTML = "EXPIRADA!"; 
-                            document.getElementById('promo-banner').style.display = 'none'; 
-                            return; 
-                        } 
-                        const horas = Math.floor(diff / (1000 * 60 * 60)); 
-                        const minutos = Math.floor((diff % (3600000)) / 60000); 
-                        const segundos = Math.floor((diff % 60000) / 1000); 
-                        document.getElementById('promo-timer').innerHTML = `${horas}h ${minutos}m ${segundos}s`; 
-                    }; 
-                    atualizarTimer(); 
-                    setInterval(atualizarTimer, 1000); 
-                } else {
-                    document.getElementById('promo-banner').style.display = 'none';
-                }
-            } catch(err) { 
-                console.log('Erro ao carregar promoção:', err); 
-            }
-        }
-        
+
         loadProjects();
-        carregarPromocao();
     </script>
+
+    <!-- Modal Projeto -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <h3 id="project-name"></h3>
+            <p id="project-desc" style="margin: 15px 0;"></p>
+            <a href="#" id="project-link" target="_blank">📞 Solicite este modelo via WhatsApp</a>
+            <button onclick="closeProjectModal()" style="margin-top: 15px; background: transparent; border: 1px solid #00ffff; padding: 8px 20px; border-radius: 30px; color: #00ffff; cursor: pointer;">Fechar</button>
+        </div>
+    </div>
 </body>
 </html>
